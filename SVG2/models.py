@@ -27,6 +27,7 @@ class User(AbstractUser):
     profile_picture = models.ImageField(upload_to='C:/HOA_MIS/media/profile_pics/', blank=True, null=True)  # Optional field for profile picture
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # Optional field for phone number
     birthdate = models.DateField(null=True, blank=True)  # Optional field for birthdate
+    email = models.EmailField(unique=True)
     
 
     class Meta:

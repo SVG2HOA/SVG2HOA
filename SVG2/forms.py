@@ -92,12 +92,18 @@ class UserSignUpForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2', 'user_type']
 
+    
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password1')
         confirm_password = cleaned_data.get('password2')
         if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
+        
+        # Check if the email is already taken
+        email = cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("This email is already in use.")
 
     def save(self, commit=True):
         user = super().save(commit=False)
