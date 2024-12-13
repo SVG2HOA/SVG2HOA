@@ -114,7 +114,7 @@ My Reservations
                             <td class="px-6 py-4">{{ reservation.status }}</td>
                             <td class="px-6 py-4 ">
                                 {% if reservation.status != 'Canceled' and reservation.status != 'Denied' and reservation.status != 'Confirmed' %}
-                                <div class="flex justify-center items-center mt-2 sm:mt-0 gap-x-4">
+                                <div class="flex justify-center items-center sm:mt-0 gap-x-4">
                                 <a href="{% url 'update_reservation' user.username reservation.id %}"
                                     class="font-medium text-blue-600 rounded-md p-2 px-4 bg-blue-100 dark:bg-blue-200 dark:text-blue-800 hover:bg-blue-300">
                                     Update

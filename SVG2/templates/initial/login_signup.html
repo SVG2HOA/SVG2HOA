@@ -71,7 +71,8 @@ input {
 }
 .hover-green {
         color: white;
-        text-decoration: none; /* Optional: remove underline */
+        text-decoration: none;
+        font-size: 15px; /* Optional: remove underline */
     }
 
     .hover-green:hover {
@@ -203,7 +204,14 @@ form.sign-in-form {
   padding: 10px;
   border: none;
 }
+.terms {
+  color: lightgreen;
+  text-decoration: none;
 
+}
+.terms:hover {
+  color:green;
+}
 /* Container for the error messages */
 .error-messages {
   background-color: #970000;  /* Light red background */
@@ -278,7 +286,42 @@ form.sign-in-form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
 }
+.form-footer {
+    width: 100%;
+    max-width: 370px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    background: none;
+    outline: none;
+}
 
+.remember-me-label {
+    margin-left: 10px;
+    color: white; /* Space between checkbox and text */
+}
+
+.forgot-password {
+    font-size: 14px;
+    color: white;
+    text-decoration: none;
+}
+
+.forgot-password:hover, .remember-me-label:hover {
+    color: green;
+}
+
+@media (max-width: 450px) {
+    .form-footer {
+        flex-direction: column; /* Stack items on small screens */
+        align-items: flex-start;
+        gap: 5px; /* Reduce gap for smaller screens */
+    }
+    .forgot-password {
+      margin-left: 10px;
+    }
+}
 .container:before {
   content: "";
   position: absolute;
@@ -530,45 +573,45 @@ form.sign-in-form {
         <div class="signin-signup ">
           <!-- Login Form -->
           <form action="" method="post" class="sign-in-form">
-              {% csrf_token %}
-              <h2 class="title animate_top ">SIGN IN</h2>
-              {% if login_form.errors %}
-                  <div class="error-messages">
-                      <ul>
-                          {% for error in login_form.errors.values %}
-                              <li>{{ error|join:" " }}</li>
-                          {% endfor %}
-                      </ul>
-                  </div>
-              {% endif %}
-              
-            
+            {% csrf_token %}
+            <h2 class="title animate_top">SIGN IN</h2>
+        
+            {% if login_form.errors %}
+                <div class="error-messages">
+                    <ul>
+                        {% for error in login_form.errors.values %}
+                            <li>{{ error|join:" " }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        
             {% if signup_form.errors %}
-            <div class="error-messages">
-                <ul>
-                    {% for error in signup_form.errors.values %}
-                        <li>{{ error|join:" " }}</li>
+                <div class="error-messages">
+                    <ul>
+                        {% for error in signup_form.errors.values %}
+                            <li>{{ error|join:" " }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        
+            {% if messages %}
+                <ul class="success-messages">
+                    {% for message in messages %}
+                        {% if "sign_up" in message.tags %}
+                            <li>{{ message }}</li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
-            </div>
-        {% endif %}
-
-              {% if messages %}
-              <ul class="success-messages">
-                {% for message in messages %}
-                {% if "sign_up" in message.tags %}
-                  <li>{{ message }}</li>
-                  {% endif %}
-                {% endfor %}
-              </ul>
             {% endif %}
-            
-              <div class="input-field relative">
-                  <i class="fas fa-user"></i>
-                  {{ login_form.username }}
-              </div>
-              
-              <div class="input-field" style="position: relative;">
+        
+            <div class="input-field relative">
+                <i class="fas fa-user"></i>
+                {{ login_form.username }}
+            </div>
+        
+            <div class="input-field" style="position: relative;">
                 <i class="fas fa-lock" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);"></i>
                 {{ login_form.password|add_class:"password-input" }}
                 <button
@@ -579,15 +622,24 @@ form.sign-in-form {
                     <i class="fas fa-eye"></i>
                 </button>
             </div>
-            
+        
+            <!-- Forgot Password and Remember Me Section -->
+            <div class="form-footer">
+              <label class="remember-me-label">
+                <input type="checkbox" name="remember" id="remember" />
+                <span>Remember me</span>
+            </label>
               
-              
-              <input type="submit" name="login" value="Login" class="btn solid" />
-                <a href="{% url 'home' %}" class="hover-green">
-                Back
-              </a>
-            </form>
           
+          <a href="{% url 'password_reset' %}" class="forgot-password">Forgot password?</a>
+          </div>
+      
+          <input type="submit" name="login" value="Login" class="btn solid" />
+          <a href="{% url 'home' %}" class="hover-green">
+              Back
+          </a>
+        </form>
+        
           <form action="" method="post" class="sign-up-form">
             {% csrf_token %}
             <h2 class="title">SIGN UP</h2>
@@ -632,6 +684,13 @@ form.sign-in-form {
               <i class="fas fa-chevron-down ml-auto text-gray-600"></i>
           </div>
             
+          <div class="form-footer">
+            <label for="terms" style="color: white;">
+              <input type="checkbox" id="terms" name="terms" required />
+              <span class="ml-2">I agree to the <a href="{% url 'about' %}#terms" id="terms-link" class="terms">Terms and Conditions</a></span>
+            </label>
+          </div>
+
             <input type="submit" name="signup" value="Sign up" class="btn" />
             <a href="{% url 'home' %}" class="hover-green">
               Back
@@ -641,6 +700,8 @@ form.sign-in-form {
       
       </div>
 
+
+      
       <div class="panels-container">
         <div class="panel left-panel">
           <div class="content">

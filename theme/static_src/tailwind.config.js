@@ -10,6 +10,8 @@ module.exports = {
         /**
          * HTML. Paths to Django template files that will contain Tailwind CSS classes.
          */
+        
+        './SVG2/templates/**/*.html',
         '../../SVG2/templates/**/*.html', // Adjust this to your actual template path
         '../../SVG2/static/js/**/*.js',
         '../../SVG2/static/css/**/*.js',
@@ -44,8 +46,18 @@ module.exports = {
         // '../../**/*.py'
     ],
     theme: {
-        extend: {},
-    },
+        extend: {
+          screens: {
+            'xs': '480px',  // Custom breakpoint for very small screens
+            'sm': '640px',  // Small devices (phones, 640px and up)
+            'md': '768px',  // Medium devices (tablets, 768px and up)
+            'lg': '1024px', // Large devices (laptops, 1024px and up)
+            'xl': '1280px', // Extra large devices (large screens, 1280px and up)
+            '2xl': '1536px', // 2x extra large devices (1536px and up)
+            '3xl': '1920px', // 3x extra large devices (1920px and up)
+          }
+        }
+      },
     plugins: [
         /**
          * '@tailwindcss/forms' is the forms plugin that provides a minimal styling

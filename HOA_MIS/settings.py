@@ -133,6 +133,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+SESSION_COOKIE_AGE = 1209600
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -168,4 +169,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'springvillegardens2hoa@gmail.com'
 EMAIL_HOST_PASSWORD = 'lelq llzs tqdq itjm'
-DEFAULT_FROM_EMAIL = 'springvillegardens2hoa@gmail.com'
+DEFAULT_FROM_EMAIL = 'springvillegardens2hoa.onrender.com'

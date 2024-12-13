@@ -217,6 +217,13 @@ class LoginSignupView(View):
             if login_form.is_valid():
                 user = login_form.get_user()
                 login(request, user)
+
+                remember = request.POST.get('remember')
+                if remember:  # If "Remember Me" is checked
+                    request.session.set_expiry(settings.SESSION_COOKIE_AGE)  # Default session duration
+                else:
+                    request.session.set_expiry(0)
+
                 return self.redirect_user(user)
 
         elif 'signup' in request.POST:  # Handle signup form submission

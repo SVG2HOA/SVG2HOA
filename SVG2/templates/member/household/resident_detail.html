@@ -52,60 +52,60 @@ Resident: {{ resident.first_name }}
         </a>
         {% endif %}
       </div>
-      <div class="mt-2 border-t border-gray-100">
+      <div class="mt-2 border-t border-gray-100 w-full">
         <dl class="divide-y divide-gray-400 ">
           
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">First Name</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.first_name }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">First Name</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.first_name }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Middle Name</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.middle_name }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Middle Name</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.middle_name }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Last Name</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.last_name }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Last Name</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.last_name }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Suffix</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.suffix }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Suffix</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.suffix }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Gender</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.get_gender_display }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Gender</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.get_gender_display }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Birth Date</dt>
-              <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.birthdate|date:"F d, Y" }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Birth Date</dt>
+              <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.birthdate|date:"F d, Y" }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Head of the Family</dt>
-              <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.is_head_of_family|yesno:"Yes,No" }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Head of the Family</dt>
+              <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.is_head_of_family|yesno:"Yes,No" }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Relation to Head</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.relation_to_head }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Relation to Head</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.relation_to_head }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Email</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"> {{ resident.email }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Email</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0"> {{ resident.email }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Contact Number</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.contact_number }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Contact Number</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.contact_number }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Civil Status</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.get_civil_status_display }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Civil Status</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.get_civil_status_display }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Religion</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.religion }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Religion</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.religion }}</dd>
           </div>
-          <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
-            <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Education Attainment</dt>
-            <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.get_educational_attainment_display }}</dd>
+          <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+            <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Education Attainment</dt>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ resident.get_educational_attainment_display }}</dd>
           </div>
         </dl>
       </div>
