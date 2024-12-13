@@ -1,4 +1,3 @@
-{% load static tailwind_tags %}
 {% load static %}
 <nav class="fixed top-0 z-50 w-full bg-green-700 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2">
   <div class="px-3 py-3 lg:px-5 lg:pl-3">
@@ -10,9 +9,9 @@
                 <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
             </svg>
         </button>
-        <a href="{% url 'member_landing_page' user.username %}" class="flex ms-2 md:me-24 truncate">
-            <img src="{% static 'images/icon.png' %}" class="h-8 me-3 hover:scale-105 " alt="SVG2 Logo" />
-            <p class="idden md:inline self-center text-xl text-white font-bold hover:text-yellow-200 sm:text-2xl truncate dark:text-white">
+        <a href="{% url 'member_landing_page' user.username %}" class="flex md:me-24 truncate">
+            <img src="{% static 'images/icon.png' %}" class="h-8 mr-2 mb-1 hover:scale-105 " alt="SVG2 Logo" />
+            <p class="sm:inline self-center text-lg text-white font-bold hover:text-yellow-200 sm:text-2xl truncate dark:text-white">
                 Springville Gardens 2
             </p>
         </a>
