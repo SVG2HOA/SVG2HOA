@@ -1,0 +1,86 @@
+{% load static tailwind_tags %}
+
+<nav class="relative px-4 py-4 flex justify-between items-center bg-white shadow-md z-50">
+    <a class="text-3xl font-bold leading-none" href="{% url 'home' %}">
+        <img src="{% static 'images/logo.png' %}" width="170px">
+    </a>
+    <div class="lg:hidden">
+        <button class="navbar-burger flex items-center text-green-600 p-3">
+            <svg class="block h-4 w-4 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
+            </svg>
+        </button>
+    </div>
+    <ul class="hidden absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 lg:flex lg:mx-auto lg:flex lg:items-center lg:w-auto lg:space-x-6">
+        <li><a class="text-base text-black-500 mr-3 hover:text-green-600 hover:underline underline-offset-4 decoration-2 {% if request.resolver_match.url_name == 'home' %} text-green-600 underline decoration-2 {% endif %}" href="{% url 'home' %}">Home</a></li>
+        <li><a class="text-base text-black-500 mr-3 hover:text-green-600 hover:underline underline-offset-4 decoration-2 {% if request.resolver_match.url_name == 'news' %} text-green-600 underline decoration-2 {% endif %}" href="{% url 'news' %}">News</a></li>
+        <li><a class="text-base text-black-500 mr-3 hover:text-green-600 hover:underline underline-offset-4 decoration-2 {% if request.resolver_match.url_name == 'calendar' %} text-green-600 underline decoration-2 {% endif %}" href="{% url 'calendar' %}">Calendar</a></li>
+  <li><a class="text-base text-black-500 mr-3 hover:text-green-600 hover:underline underline-offset-4 decoration-2 {% if request.resolver_match.url_name == 'communitymap' %} text-green-600 underline decoration-2 {% endif %}" href="{% url 'communitymap' %}">Map</a></li>
+  <li class='group max-lg:border-none max-lg:py-2 relative'><a class="group text-base text-black-500 hover:text-green-600 lg:hover:fill-green-600 block hover:underline underline-offset-4 decoration-2 {% if request.resolver_match.url_name == 'about' %} group text-green-600 underline decoration-2 {% endif %}" href="{% url 'about' %}">About
+    <svg
+      xmlns="http://www.w3.org/2000/svg" width="13px" height="13px" class="ml-1 inline-block" viewBox="0 0 24 24">
+      <path
+        d="M12 16a1 1 0 0 1-.71-.29l-6-6a1 1 0 0 1 1.42-1.42l5.29 5.3 5.29-5.29a1 1 0 0 1 1.41 1.41l-6 6a1 1 0 0 1-.7.29z"
+        data-name="16" data-original="#000000" />
+    </svg>
+</a>
+<ul
+class='absolute hidden group-hover:block shadow-lg bg-white px-6 pb-4 pt-6 space-y-3 rounded-md lg:top-5 max-lg:top-8 -left-6 min-w-[250px] z-50'>
+<li class='border-b py-1 '><a href="{% url 'about' %}#contact" class='hover:text-green-600 text-base text-black-500 block'>Contact us</a></li>
+<li class='border-b py-1 '><a href="{% url 'about' %}#faqs"
+    class='hover:text-green-600 text-base text-black-500 block'>FAQs</a></li>
+</ul></li>
+    </ul>
+    
+    <a class="hidden lg:inline-block py-2 px-6 bg-green-500 hover:bg-green-600 text-base text-white font-bold rounded-xl transition duration-200" href="{% url 'login' %}">
+        <svg class="inline-block w-4 h-6 text-white-500 transition duration-75 dark:text-white-400 group-hover:text-white-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"/>
+         </svg>
+         Sign In</a>
+    
+</nav>
+<div class="navbar-menu relative z-50 hidden">
+    <div class="navbar-backdrop fixed inset-0 bg-green-800 opacity-25"></div>
+    <nav class="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-white border-r overflow-y-auto">
+        <div class="flex items-center mb-8">
+            <a class="mr-auto text-3xl font-bold leading-none" href="#">
+                <img src="{% static 'images/icon.png' %}" width="100px">
+            </a>
+            <button class="navbar-close">
+                <svg class="h-6 w-6 text-green-400 cursor-pointer hover:text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div>
+            <ul>
+                <li>
+                    <a href="{% url 'home' %}" class="flex items-center w-full p-2 my-2 text-gray-900 transition duration-75 rounded-lg group hover:bg-green-400 dark:text-white dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'home' %} bg-green-500 {% endif %}">Home</a>
+                 </li>
+                 <li>
+                    <a href="{% url 'news' %}" class="flex items-center w-full p-2 my-2 text-gray-900 transition duration-75 rounded-lg group hover:bg-green-400 dark:text-white dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'news' or request.resolver_match.url_name == 'news_article' %} bg-green-500 {% endif %}">News</a>
+                 </li>
+                 <li>
+                    <a href="{% url 'calendar' %}" class="flex items-center w-full p-2 my-2 text-gray-900 transition duration-75 rounded-lg group hover:bg-green-400 dark:text-white dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'calendar' or request.resolver_match.url_name == 'calendar_with_date' %} bg-green-500 {% endif %}">Calendar</a>
+                 </li>
+                 <li>
+                    <a href="{% url 'communitymap' %}" class="flex items-center w-full my-2 p-2 text-gray-900 transition duration-75 rounded-lg group hover:bg-green-400 dark:text-white dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'communitymap' %} bg-green-500 {% endif %}">Map</a>
+                 </li>
+                 <li>
+                     <a href="{% url 'about' %}" class="flex items-center w-full p-2 my-2 text-gray-900 transition duration-75 rounded-lg group hover:bg-green-400 dark:text-white dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'about' %} bg-green-500 {% endif %}">About</a>
+                  </li>
+            </ul>
+        </div>
+        <div class="mt-auto">
+            <div class="pt-6">
+                <p class="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold leading-none bg-green-50 rounded-xl hover:bg-green-100">Sign up as<a class="hover:text-green-600 font-bold" href="{% url 'login' %}">
+                    Member</a> or as <a class="hover:text-green-600 font-bold" href="{% url 'login' %}">
+                        Officer</a></p> 
+                <a class="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-green-500 hover:bg-green-600 font-bold rounded-xl" href="{% url 'login' %}">Sign In</a>
+            </div>
+            <p class="my-4 text-xs text-center text-green-600">
+                <span>Copyright © 2024</span>
+            </p>
+        </div>
+    </nav>
+    </div>

@@ -1,0 +1,429 @@
+{% extends "officer/officer_base.html" %}
+{% load static %}
+{% block title %}
+Dashboard
+{% endblock title %}
+{% block content %}
+<div class="px-4 pt-16 lg:ml-64">
+  <div class="py-8 dark:border-gray-700 grid gap-6">
+
+    <div class="w-full text-left bg-blue-200 rounded-xl py-2 px-4">
+      <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 text-left">
+        Welcome, {% if request.user.is_officer %}
+        {{ request.user.officer_profile.officer_position|default:"Officer" }}
+        {{ request.user.username }}!
+        {% endif %}
+      </h2>
+      <p class="text-md text-gray-600 text-left">
+        Your central hub for managing community activities and operations.
+      </p>
+    </div>
+
+    <div class="grid col-span-1 sm:grid-cols-1 md:grid-cols-12 lg:grid-cols-9 gap-6">
+      <div class="bg-white shadow-lg sm:col-span-1 md:col-span-4 lg:col-span-3 rounded-lg p-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-md sm:text-xl font-semibold text-gray-800 ">
+            Users
+          </h2>
+          <p class="text-5xl font-bold text-black">{{ total_users }}</p>
+        </div>
+        <div class="text-4xl text-green-700">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
+            <path
+              d="M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-1.01.75.75 0 0 0 .42-.643 4.875 4.875 0 0 0-6.957-4.611 8.586 8.586 0 0 1 1.71 5.157v.003Z" />
+          </svg>
+        </div>
+      </div>
+      <div class="bg-white shadow-lg sm:col-span-1 md:col-span-4 lg:col-span-3 rounded-lg p-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-md sm:text-xl font-semibold text-gray-800 ">Households</h2>
+          <p class="text-5xl font-bold text-black">{{ total_households }}</p>
+        </div>
+        <div class="text-4xl text-green-700">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
+            <path
+              d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
+            <path
+              d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
+          </svg>
+        </div>
+      </div>
+      <div class="bg-white shadow-lg sm:col-span-1 md:col-span-4 lg:col-span-3 rounded-lg p-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-md sm:text-xl font-semibold text-gray-800 ">Residents</h2>
+          <p class="text-5xl font-bold text-black">{{ total_residents }}</p>
+        </div>
+        <div class="text-4xl text-green-700">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12 sm:size-14">
+            <path fill-rule="evenodd"
+              d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z"
+              clip-rule="evenodd" />
+            <path
+              d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z" />
+          </svg>
+        </div>
+      </div>
+      <div class="grid md:col-span-12 lg:col-span-9 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
+        <div class="bg-white shadow-lg sm:col-span-1 md:col-span-1 lg:col-span-1 rounded-lg p-6 justify-between items-center">
+          <h2 class="text-md lg:text-xl font-semibold text-gray-800 mb-2 w-1/2 ">Pending Reservations</h2>
+          <div class="text-cyan-700 flex items-center justify-between w-full">
+
+            <p class="text-5xl font-bold text-red-800">{{ pending_reservations }}</p>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
+              <path fill-rule="evenodd"
+                d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z"
+                clip-rule="evenodd" />
+              <path fill-rule="evenodd"
+                d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375ZM6 12a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V12Zm2.25 0a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM6 15a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V15Zm2.25 0a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM6 18a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V18Zm2.25 0a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75Z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <div class="bg-white shadow-lg sm:col-span-1 md:col-span-1 lg:col-span-1 rounded-lg p-6 justify-between items-center">
+          <h2 class="text-md lg:text-xl font-semibold text-gray-800 mb-2 w-1/2">Pending Requests</h2>
+          <div class="text-yellow-600 flex items-center justify-between w-full">
+
+            <p class="text-5xl font-bold text-red-800">{{ pending_requests }}</p>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
+              <path fill-rule="evenodd"
+                d="M12 6.75a5.25 5.25 0 0 1 6.775-5.025.75.75 0 0 1 .313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 0 1 1.248.313 5.25 5.25 0 0 1-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 1 1 2.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0 1 12 6.75ZM4.117 19.125a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
+                clip-rule="evenodd" />
+              <path
+                d="m10.076 8.64-2.201-2.2V4.874a.75.75 0 0 0-.364-.643l-3.75-2.25a.75.75 0 0 0-.916.113l-.75.75a.75.75 0 0 0-.113.916l2.25 3.75a.75.75 0 0 0 .643.364h1.564l2.062 2.062 1.575-1.297Z" />
+              <path fill-rule="evenodd"
+                d="m12.556 17.329 4.183 4.182a3.375 3.375 0 0 0 4.773-4.773l-3.306-3.305a6.803 6.803 0 0 1-1.53.043c-.394-.034-.682-.006-.867.042a.589.589 0 0 0-.167.063l-3.086 3.748Zm3.414-1.36a.75.75 0 0 1 1.06 0l1.875 1.876a.75.75 0 1 1-1.06 1.06L15.97 17.03a.75.75 0 0 1 0-1.06Z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <div
+          class="bg-white shadow-lg sm:col-span-1 md:col-span-1 lg:col-span-1 rounded-lg p-6 justify-between items-center">
+          <h2 class="text-md lg:text-xl font-semibold text-gray-800 mb-2 ">Pending Appointments</h2>
+          <div class="text-blue-800 flex items-center justify-between w-full">
+
+            <p class="text-5xl font-bold text-red-800">{{ pending_appointments }}</p>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
+              <path
+                d="M4.913 2.658c2.075-.27 4.19-.408 6.337-.408 2.147 0 4.262.139 6.337.408 1.922.25 3.291 1.861 3.405 3.727a4.403 4.403 0 0 0-1.032-.211 50.89 50.89 0 0 0-8.42 0c-2.358.196-4.04 2.19-4.04 4.434v4.286a4.47 4.47 0 0 0 2.433 3.984L7.28 21.53A.75.75 0 0 1 6 21v-4.03a48.527 48.527 0 0 1-1.087-.128C2.905 16.58 1.5 14.833 1.5 12.862V6.638c0-1.97 1.405-3.718 3.413-3.979Z" />
+              <path
+                d="M15.75 7.5c-1.376 0-2.739.057-4.086.169C10.124 7.797 9 9.103 9 10.609v4.285c0 1.507 1.128 2.814 2.67 2.94 1.243.102 2.5.157 3.768.165l2.782 2.781a.75.75 0 0 0 1.28-.53v-2.39l.33-.026c1.542-.125 2.67-1.433 2.67-2.94v-4.286c0-1.505-1.125-2.811-2.664-2.94A49.392 49.392 0 0 0 15.75 7.5Z" />
+            </svg>
+          </div>
+        </div>
+        <div
+          class="bg-white shadow-lg sm:col-span-1 md:col-span-1 lg:col-span-1 rounded-lg p-6 justify-between items-center">
+          <h2 class="text-md lg:text-xl font-semibold text-gray-800 mb-8 ">Overdues</h2>
+          <div class="text-cyan-700 flex items-center justify-between w-full">
+
+            <p class="text-5xl font-bold text-red-800">{{ overdue_count }}</p>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
+              <path d="M12 7.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
+              <path fill-rule="evenodd"
+                d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 14.625v-9.75ZM8.25 9.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM18.75 9a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75V9.75a.75.75 0 0 0-.75-.75h-.008ZM4.5 9.75A.75.75 0 0 1 5.25 9h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H5.25a.75.75 0 0 1-.75-.75V9.75Z"
+                clip-rule="evenodd" />
+              <path
+                d="M2.25 18a.75.75 0 0 0 0 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 0 0-.75-.75H2.25Z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div
+        class="bg-white shadow-lg sm:col-span-1 md:col-span-7 lg:col-span-5 rounded-lg p-6 justify-between items-center">
+        <p class="text-md text-gray-500 text-center mb-4">Activity Overview</p>
+        <div class="responsive-chart">
+          <canvas id="activityBarChart" class="w-full"></canvas>
+        </div>
+      </div>
+      <div
+        class="bg-white shadow-lg sm:col-span-1 md:col-span-5 lg:col-span-4 rounded-lg p-6 justify-between items-center">
+        <p class="text-md text-gray-500 text-center">Age Demographics</p>
+        <div class="responsive-chart">
+          <canvas id="ageChart"></canvas>
+          <script id="age-data" type="application/json">
+                      {{ age_demographics|json_script:"age-data" }}
+                  </script>
+        </div>
+      </div>
+      <div
+        class="bg-white shadow-lg sm:col-span-1 md:col-span-4 lg:col-span-3 rounded-lg p-6 justify-between items-center">
+        <p class="text-md text-gray-500 text-center">Amenities Usage</p>
+        <div class="responsive-chart">
+          <canvas id="amenityChart"></canvas>
+          <script id="amenity-data" type="application/json">
+                  {{ amenity_usage|json_script:"amenity-data" }}
+                  </script>
+        </div>
+      </div>
+      <div
+        class="bg-white shadow-lg sm:col-span-1 md:col-span-4 lg:col-span-3 rounded-lg p-6 justify-between items-center">
+        <p class="text-md text-gray-500 text-center mb-4">Vehicles</p>
+        <div class="responsive-chart">
+          <canvas id="vehicleChart"></canvas>
+          <script id="vehicle-data" type="application/json">
+                    {{ vehicle_demographics|json_script:"vehicle-data" }}
+                  </script>
+        </div>
+      </div>
+      <div
+        class="bg-white shadow-lg sm:col-span-1 md:col-span-4 lg:col-span-3 rounded-lg p-6 justify-between items-center">
+        <p class="text-md text-gray-500 text-center">Residents Gender Ratio</p>
+        <div class="responsive-chart">
+          <canvas id="sexChart"></canvas>
+          <script id="sex-data" type="application/json">
+                      {{ sex_demographics|json_script:"sex-data" }}
+                  </script>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const ctxact = document.getElementById('activityBarChart').getContext('2d');
+      const activityBarChart = new Chart(ctxact, {
+        type: 'bar',
+        data: {
+          labels: ['Reservations', 'Appointments', 'Requests'],
+          datasets: [{
+            label: 'Number of Entries',
+            data: [
+              {{ reservation_count }},
+          {{ appointment_count }},
+                                  {{ request_count }}
+                              ],
+      backgroundColor: [
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(255, 159, 64, 0.2)'
+      ],
+        borderColor: [
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+          borderWidth: 1
+                          }]
+                      },
+      options: {
+        responsive: true,
+          plugins: {
+          legend: {
+            display: false  // Disable the legend
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+                      });
+    </script>
+    <style>
+      .responsive-chart {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+
+      .responsive-chart canvas {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 400px;
+        /* Adjust based on your preferred max height */
+      }
+
+      .responsive-chart p {
+        margin-bottom: 1rem;
+        /* Space above the chart */
+      }
+    </style>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+  const amenityData = {{ amenity_usage| safe }};  // Pass the Django data to JavaScript
+  const labels = amenityData.map(item => item.amenities);  // Get amenities
+  const data = amenityData.map(item => item.count);  // Get count of each amenity
+
+  const ctx = document.getElementById('amenityChart').getContext('2d');
+  const amenityChart = new Chart(ctx, {
+    type: 'bar',  // You can change this to 'pie' or 'line' depending on the chart style
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Amenity Usage',
+        data: data,
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false  // Disable the legend
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  const sexData = {{ sex_demographics| safe }};
+  const sexLabels = sexData.map(item => item.gender);
+  const sexCounts = sexData.map(item => item.total);
+
+  const ctxSex = document.getElementById('sexChart').getContext('2d');
+  const sexChart = new Chart(ctxSex, {
+    type: 'pie',
+    data: {
+      labels: sexLabels,
+      datasets: [{
+        label: 'Sex Demographics',
+        data: sexCounts,
+        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.6)'],
+        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom', // Change legend position to make labels more visible
+          labels: {
+            font: {
+              size: 14 // Increase the font size for better readability
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function (tooltipItem) {
+              return `${sexLabels[tooltipItem.dataIndex]}: ${sexCounts[tooltipItem.dataIndex]}`;
+            }
+          }
+        }
+      },
+      layout: {
+        padding: {
+          top: 10,
+          bottom: 10 // Add padding around the chart to give more space for labels
+        }
+      }
+    }
+  });
+
+  const ageData = {{ age_demographics| safe }};
+  const ageLabels = ageData.map(item => item.age_range);
+  const ageCounts = ageData.map(item => item.total);
+
+  const ctxAge = document.getElementById('ageChart').getContext('2d');
+  const ageChart = new Chart(ctxAge, {
+    type: 'pie',
+    data: {
+      labels: ageLabels,
+      datasets: [{
+        label: 'Age Demographics',
+        data: ageCounts,
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.6)',  // Light Red
+          'rgba(54, 162, 235, 0.6)',  // Light Blue
+          'rgba(255, 206, 86, 0.6)',  // Light Yellow
+          'rgba(75, 192, 192, 0.6)',  // Light Teal
+          'rgba(153, 102, 255, 0.6)', // Light Purple
+          'rgba(255, 159, 64, 0.6)',  // Light Orange
+          'rgba(255, 50, 50, 0.6)'   // Light Green
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1',  // Light Red
+          'rgba(54, 162, 235, 1)',  // Light Blue
+          'rgba(255, 206, 86, 1)',  // Light Yellow
+          'rgba(75, 192, 192, 1)',  // Light Teal
+          'rgba(153, 102, 255, 1)', // Light Purple
+          'rgba(255, 159, 64, 1)',  // Light Orange
+          'rgba(255, 50, 50, 1)'   // Light Green
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom', // Change legend position to make labels more visible
+          labels: {
+            font: {
+              size: 14 // Increase the font size for better readability
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Fetch vehicle data from the script tag
+  const vehicleData = {{ vehicle_demographics| safe }};
+  // Extract labels (vehicle types) and counts
+  const vehicleLabels = vehicleData.map(item => item.vehicles_owned);
+  const vehicleCounts = vehicleData.map(item => item.total);
+
+  // Create the vehicle chart
+  const ctxVehicle = document.getElementById('vehicleChart').getContext('2d');
+  const vehicleChart = new Chart(ctxVehicle, {
+    type: 'bar',
+    data: {
+      labels: vehicleLabels,
+      datasets: [{
+        label: '',
+        data: vehicleCounts,
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.6)',  // Light Red
+          'rgba(54, 162, 235, 0.6)',  // Light Blue
+          'rgba(255, 206, 86, 0.6)',  // Light Yellow
+          'rgba(75, 192, 192, 0.6)',  // Light Teal
+          'rgba(153, 102, 255, 0.6)', // Light Purple
+          'rgba(255, 159, 64, 0.6)'   // Light Orange
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',  // Light Red
+          'rgba(54, 162, 235, 1)',  // Light Blue
+          'rgba(255, 206, 86, 1)',  // Light Yellow
+          'rgba(75, 192, 192, 1)',  // Light Teal
+          'rgba(153, 102, 255, 1)', // Light Purple
+          'rgba(255, 159, 64, 1)'   // Light Orange
+        ],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false  // Disable the legend
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+</script>
+{% endblock %}

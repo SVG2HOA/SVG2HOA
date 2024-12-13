@@ -1,0 +1,124 @@
+{% extends "officer/officer_base.html" %}
+
+{% load static %}
+
+{% block title %}
+Resident: {{ resident.first_name }}
+{% endblock title %}
+
+{% block content %}
+<div class="pt-16 lg:ml-64">
+  <div class="p-4 dark:border-gray-700">
+
+    <nav class="flex" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center mt-4 space-x-1 md:space-x-2 rtl:space-x-reverse">
+        <li class="inline-flex items-center">
+          <a href="{% url 'household_list' user.username %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+            Households
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+            </svg>
+            <a href="{% url 'view_household' user.username household.id %}" class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">Household ({{ household.owner_name.fname }} {{ household.owner_name.lname }})</a>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+            </svg>
+            <p class="ms-1 text-sm font-medium text-gray-700 md:ms-2 dark:text-gray-400 dark:hover:text-white">Resident ({{ resident.first_name }} {{ resident.last_name }})</p>
+          </div>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="mt-4">
+      <div class="sm:px-0">
+        {% if messages %}
+        <ul class="messages text-center text-green-500 text-lg font-semibold mt-4">
+            {% for message in messages %}
+                {% if "resident_officer_update" in message.tags %}
+                    <li
+                        {% if message.tags %} class="{{ message.tags }}"
+                        {% endif %}>{{ message.message }}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+                <h3 class="text-3xl font-semibold leading-7 text-gray-900 mr-5">Resident Profile</h3>
+                {% if user.is_officer %}
+                <a href="{% url 'edit_resident_info' user.username household.id resident.id %}" 
+                class="text-sm font-semibold leading-7 text-blue-700 flex items-center gap-1 mt-1 hover:text-blue-500">Edit<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-3">
+                  <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+                </svg>
+                </a>
+                {% endif %}
+              </div>
+              <div class="mt-2 border-t border-gray-100">
+                <dl class="divide-y divide-gray-400 ">
+                  
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">First Name</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.first_name }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Middle Name</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.middle_name }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Last Name</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.last_name }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Suffix</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.suffix }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Gender</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.get_gender_display }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Birth Date</dt>
+                      <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.birthdate|date:"F d, Y" }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Head of the Family</dt>
+                      <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.is_head_of_family|yesno:"Yes,No" }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Relation to Head</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.relation_to_head }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Email</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"> {{ resident.email }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Contact Number</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.contact_number }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Civil Status</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.get_civil_status_display }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Religion</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.religion }}</dd>
+                  </div>
+                  <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
+                    <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Education Attainment</dt>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.get_educational_attainment_display }}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          
+    </div>
+    </div>
+{% endblock %}
+

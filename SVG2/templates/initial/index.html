@@ -1,0 +1,33 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html class="scroll-smooth">
+    <head>
+        <title>
+            {% block title %}
+            {% endblock %}
+        </title>
+        
+        {% tailwind_css %}
+        <link rel="shortcut icon" href="{%  static 'images/icon.png' %}">
+        <link rel="stylesheet" href="{%  static 'css/dist/styles.css' %}">
+        <link rel="stylesheet" href="{%  static 'css/styles.css' %}">
+        <link rel="stylesheet" href="{%  static 'css/style.css' %}">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-rotation@0.0.5/leaflet-rotation.css"/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-rotation@0.0.5/leaflet-rotation.js"></script>
+    </head>
+    <body class="bg-gray-100">
+        {% include "initial/nav.html" %}
+        
+        {% block content %}
+        
+        {% endblock content%}
+        
+        {% include "initial/footer.html" %}
+        
+        <script src="{% static 'js/bundle.js' %}"></script>
+        <script src="{% static 'js/script.js' %}"></script>
+    </body>
+</html>

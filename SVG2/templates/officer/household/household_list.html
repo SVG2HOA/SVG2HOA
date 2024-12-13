@@ -1,0 +1,229 @@
+{% extends 'officer/officer_base.html' %}
+{% load static %}
+{% block title %}
+Household List
+{% endblock title %}
+
+{% block content %}
+<div class="pt-16 lg:ml-64">
+    <div class="p-4 rounded-lg">
+              {% if messages %}
+              <ul class="messages text-center text-green-500 text-lg font-semibold mt-2">
+                  {% for message in messages %}
+                      {% if "billing_added" in message.tags %}
+                          <li
+                              {% if message.tags %} class="{{ message.tags }}"
+                              {% endif %}>{{ message.message }}
+                          </li>
+                      {% endif %}
+                  {% endfor %}
+              </ul>
+          {% endif %}
+
+        <div class="w-full flex flex-wrap items-center justify-between sm:inline-block mt-2">
+            <div class="w-full sm:w-auto text-center sm:text-left">
+                <h3 class="text-3xl font-semibold leading-7 text-gray-900 mr-5">
+                    Households
+                  </h3>
+            </div>
+        </div>
+
+        <div class="w-full flex flex-wrap items-center justify-between sm:flex-start mt-4 mb-2 gap-4">
+            <div class="w-full sm:w-auto sm:mt-0 flex flex-wrap items-center gap-4 justify-center sm:justify-start">
+                <form method="GET" action="" class="w-full sm:w-auto">
+            <div class="relative">
+                <input type="text" name="search" value="{{ search_query }}"
+                    class="block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Search">
+                <button type="submit" class="absolute right-0 top-0 mt-2 mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="size-6">
+                        <path fill-rule="evenodd"
+                            d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+        <button id="addBillingBtn" class="bg-blue-500 text-md text-white font-bold px-3 py-1 rounded hover:bg-blue-700">
+            + Billing
+        </button>
+        </div>
+        <form method="GET" action="" class="w-full sm:w-auto">
+            <div class="flex items-center justify-between">
+                <label for="sort" class="mr-2">Sort by:</label>
+                <select name="sort" id="sort"
+                    class="px-4 py-1 pr-9 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    onchange="this.form.submit()">
+                    <option value="owner_name__fname" {% if sort_by == 'owner_name__fname' %}selected{% endif %}>Household Name</option>
+                    <option value="block" {% if sort_by == 'block' %}selected{% endif %}>Block</option>
+                    <option value="street" {% if sort_by == 'street' %}selected{% endif %}>Street</option>
+                    <option value="number_of_residents" {% if sort_by == 'number_of_residents' %}selected{% endif %}>No. of Residents</option>
+                    <option value="overall_billing_status" {% if sort_by == 'overall_billing_status' %}selected{% endif %}>Billing Status</option>
+                    <!-- Removed billing status from backend sorting -->
+                </select>
+                <button type="submit" name="direction"
+                    value="{% if direction == 'asc' %}desc{% else %}asc{% endif %}"
+                    class="ml-2 px-4 py-2 text-gray-500 hover:text-gray-700">
+                    {% if direction == 'asc' %}
+                    Ascending ↑
+                    {% else %}
+                    Descending ↓
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+        <div id="billingModal"
+                            class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-6 shadow-lg w-11/12 sm:w-1/3 max-w-md">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Add Monthly Billing</h3>
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <div class="mb-4">
+                                        <label for="billing_month" class="block text-sm font-medium text-gray-700 mb-1">Billing Month</label>
+                                        <input type="month" id="billing_month" name="billing_month" required
+                                            class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-200">
+                                    </div>
+                
+                                    <div class="mb-4">
+                                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                                        <input type="number" id="amount" name="amount" value="{{ billing.amount|default:280 }}" step="0.01" required
+                                            class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-200">
+                                    </div>
+                                    <div class="flex justify-center gap-6 mt-8">
+                                        <button type="submit">
+                                            <span
+                                                class="font-medium text-blue-600 rounded-md p-2 px-6 bg-blue-200 dark:bg-blue-200 dark:text-blue-800 hover:bg-blue-300">Submit</span>
+                                        </button>
+                                        <button type="button" id="cancelBtn">
+                                            <span class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Cancel</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+        <script>
+            const addBillingBtn = document.getElementById("addBillingBtn");
+            const billingModal = document.getElementById("billingModal");
+            const cancelBtn = document.getElementById("cancelBtn");
+
+            addBillingBtn.addEventListener("click", () => billingModal.classList.remove("hidden"));
+            cancelBtn.addEventListener("click", () => billingModal.classList.add("hidden"));
+
+            window.addEventListener("click", (e) => {
+                if (e.target === billingModal) billingModal.classList.add("hidden");
+            });
+        </script>
+        <div class="relative shadow-md sm:rounded-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+                    <thead
+                        class="text-md text-white uppercase bg-green-700 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8 rounded-tl-lg">
+                            Household
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            Block
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            Street
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            No. of Residents
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8 rounded-tr-lg">
+                            Billing Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800">
+                            {% for household in households %}
+                                <tr class="border-b text-gray-700 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <th scope="row" class="px-6 py-4 text-gray-900 font-semibold whitespace-nowrap dark:text-white">
+                                        <a href="{% url 'view_household' user.username household.id %}" class="font-medium hover:text-blue-600">{{ household.owner_name.fname }} {{ household.owner_name.lname }}</a>
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        {{ household.block }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ household.street }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ household.number_of_residents }}
+                                    </td>
+                                    <td class="px-6 py-4" data-status="{% if household.overall_billing_status == 'Updated' %}1{% elif household.overall_billing_status == 'Unpaid' %}2{% elif household.overall_billing_status == 'Overdue' %}3{% elif household.overall_billing_status == 'Empty' %}4{% endif %}">
+                                        <span class="{% if household.overall_billing_status == 'Updated' %}text-green-600 bg-green-100 dark:bg-green-200 dark:text-green-800{% elif household.overall_billing_status == 'Unpaid' %}text-yellow-600 bg-yellow-100 dark:bg-yellow-200 dark:text-yellow-800{% elif household.overall_billing_status == 'Overdue' %}text-red-600 bg-red-100 dark:bg-red-200 dark:text-red-800{% elif household.overall_billing_status == 'Empty' %}text-gray-600 bg-gray-200 dark:bg-gray-200 dark:text-gray-800{% endif %} px-2 py-1 rounded">
+                                            {{ household.overall_billing_status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                                    No households found.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if households %}
+        <div class="mt-6 flex justify-center space-x-4">
+          {% if households.has_previous %}
+            <a href="?page={{ households.previous_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+              Previous
+            </a>
+          {% endif %}
+      
+          {% if households.number > 1 %}
+            <a href="?page=1" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+              1
+            </a>
+            {% if households.number > 3 %}
+              <span class="px-4 py-2 text-gray-900">...</span>
+            {% endif %}
+          {% endif %}
+      
+          {% if households.number > 2 %}
+            <a href="?page={{ households.number|add:-1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+              {{ households.number|add:-1 }}
+            </a>
+          {% endif %}
+      
+          <span class="px-4 py-2 bg-blue-500 text-white rounded">{{ households.number }}</span>
+      
+          {% if households.number < households.paginator.num_pages %}
+            {% if households.number < households.paginator.num_pages|add:-1 %}
+              <a href="?page={{ households.number|add:1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+                {{ households.number|add:1 }}
+              </a>
+            {% endif %}
+          {% endif %}
+      
+          {% if households.number < households.paginator.num_pages %}
+            {% if households.number < households.paginator.num_pages|add:-2 %}
+              <span class="px-4 py-2 text-gray-900">...</span>
+            {% endif %}
+            {% if households.number != households.paginator.num_pages %}
+              <a href="?page={{ households.paginator.num_pages }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+                {{ households.paginator.num_pages }}
+              </a>
+            {% endif %}
+          {% endif %}
+      
+          {% if households.has_next %}
+            <a href="?page={{ households.next_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+              Next
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+</div>
+{% endblock %}

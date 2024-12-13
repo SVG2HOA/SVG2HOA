@@ -1,0 +1,29 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            {% block title %}
+            {% endblock %}
+        </title>
+        {% tailwind_css %}
+        <link rel="shortcut icon" href="{%  static 'images/icon.png' %}">
+        <link rel="stylesheet" href="{%  static 'theme/static/css/dist/styles.css' %}">
+        <link rel="stylesheet" href="{%  static 'theme/static_src/src/styles.css' %}">
+        <script src="{% static 'js/bundle.js' %}"></script>
+        <link rel="shortcut icon" href="{%  static 'images/icon.png' %}">
+        <link rel="stylesheet" href="{%  static 'css/styles.css' %}">
+        <link rel="stylesheet" href="{%  static 'css/style.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <script src="{% static 'js/script.js' %}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        
+        {% block content %}
+        
+        {% endblock content%}
+        <script defer src="{% static 'js/bundle.js' %}"></script>
+    </body>
+</html>

@@ -1,0 +1,224 @@
+{% extends "member/base.html" %}
+{% load static %}
+{% block title %}
+My Requests
+{% endblock %}
+
+{% block content %}
+<div class="pt-16 lg:ml-64">
+    <div class="p-4 rounded-lg">
+              {% if messages %}
+              <ul class="messages text-center text-yellow-500 text-lg font-semibold mt-2">
+                  {% for message in messages %}
+                      {% if "request_canceled" in message.tags %}
+                          <li
+                              {% if message.tags %} class="{{ message.tags }}"
+                              {% endif %}>{{ message.message }}
+                          </li>
+                      {% endif %}
+                  {% endfor %}
+              </ul>
+          {% endif %}
+        <div class="w-full flex flex-wrap items-center justify-between sm:inline-block mt-2">
+            <div class="w-full sm:w-auto text-center sm:text-left">
+                <h3 class="text-3xl font-semibold leading-7 text-gray-900 mr-5">
+                    My Requests
+                  </h3>
+                  <p class="text-sm leading-6 text-gray-600 mt-2">Submit and track maintenance or incident reports. Monitor the status of requests for repairs or issues within the community.</p>
+            </div>
+        </div>
+
+
+        <div class="w-full flex flex-wrap items-center justify-between sm:flex-start mt-4 mb-2 gap-4">
+            <div class="w-full sm:w-auto sm:mt-0 flex flex-wrap items-center gap-4 justify-center sm:justify-start">
+                <form method="GET" action="" class="w-full sm:w-auto">
+                    <div class="relative">
+                        <input type="text" name="search" value="{{ search_query }}"
+                            class="block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                            placeholder="Search">
+                        <button type="submit" class="absolute right-0 top-0 mt-2 mr-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-6">
+                                <path fill-rule="evenodd"
+                                    d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+                <a href="{% url 'submit_request' user.username %}">
+                    <span
+                        class="rounded-md bg-green-700 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
+                        + New Request
+                    </span>
+                </a>
+                </div>
+                <form method="GET" action="" class="w-full sm:w-auto">
+                    <div class="flex items-center justify-between">
+                        <label for="sort" class="mr-2">Sort by:</label>
+                        <select name="sort" id="sort"
+                            class="px-4 py-1 pr-9 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            onchange="this.form.submit()">
+                            <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Subject</option>
+                            <option value="service_type" {% if sort_by == 'service_type' %}selected{% endif %}>Service Type</option>
+                            <option value="updated_at" {% if sort_by == 'updated_at' %}selected{% endif %}>Submitted</option>
+                            <option value="status" {% if sort_by == 'status' %}selected{% endif %}>Status</option>
+                        </select>
+                        <button type="submit" name="direction"
+                            value="{% if direction == 'asc' %}desc{% else %}asc{% endif %}"
+                            class="ml-2 px-4 py-2 text-gray-500 hover:text-gray-700">
+                            {% if direction == 'asc' %}
+                            Ascending ↑
+                            {% else %}
+                            Descending ↓
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+         <div class="relative shadow-md sm:rounded-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+                    <thead
+                        class="text-md text-white uppercase bg-green-700 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Subject</th>
+                            <th scope="col" class="px-6 py-3">Service Type</th>
+                            <th scope="col" class="px-6 py-3">Submitted</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Actions</th> 
+                        </tr>
+
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800">
+                        {% if no_household %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-lg text-gray-500 dark:text-gray-400 text-center">
+                                No household profile yet. <a href="{% url 'add_household' user.username %}"
+                                    class="text-blue-600 hover:text-blue-400">Create here.</a>
+                            </td>
+                        </tr>
+                        {% elif service_requests %}
+                            {% for servicerequest in service_requests %}
+                            <tr class="bg-white text-gray-700 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <td class="px-6 py-6">{{ servicerequest.title }}</td>
+                            <td class="px-6 py-4">{{ servicerequest.service_type }}</td>
+                            <td class="px-6 py-4">{{ servicerequest.updated_at }}</td>
+                            <td class="px-6 py-4">{{ servicerequest.status }}</td>
+                            <td class="px-6 py-4">
+                                {% if servicerequest.status != 'Canceled' and servicerequest.status != 'In Progress' and servicerequest.status != 'Completed' %}
+
+                                <div class="flex justify-center items-center mt-2 sm:mt-0 gap-x-4">
+                                <a href="{% url 'update_request' user.username servicerequest.id %}"
+                                    class="font-medium text-blue-600 rounded-md py-2 px-4 bg-blue-100 dark:bg-blue-200 dark:text-blue-800 hover:bg-blue-300">Update</a>
+                                <a href="#"
+                                    class="font-medium text-red-600 rounded-md py-2 px-4 bg-red-100 dark:bg-red-200 dark:text-red-800 hover:bg-red-300"
+                                    onclick="openModal({{ servicerequest.id }})">Cancel</a>
+                                </div>
+                                {% endif %}
+                                
+                            </td>
+                        </tr>
+
+                        <div id="cancelModal"
+                        class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+                        <div class="bg-white rounded-lg p-6 shadow-lg w-11/12 sm:w-1/3 max-w-md">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Confirm Cancellation?</h3>
+                            <p class="text-gray-600">Are you sure you want to cancel this request?</p>
+                            <form id="cancelForm" method="post" action="">
+                                {% csrf_token %}
+                                <div class="flex justify-center gap-6 mt-8">
+                                    <button type="submit">
+                                        <span
+                                            class="font-medium text-red-600 rounded-md p-2 px-4 bg-red-200 dark:bg-red-200 dark:text-red-800 hover:bg-red-300">Confirm</span>
+                                    </button>
+                                    <button type="button" onclick="closeModal()">
+                                        <span class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Cancel</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                                <!-- JavaScript to open/close the modal and set form action -->
+                                <script>
+                                    function openModal(serviceRequestId) {
+                                        const username = "{{ user.username }}";
+                                        document.getElementById('cancelModal').classList.remove('hidden');
+                                        document.getElementById('cancelForm').action = `/${username}/request/cancel/${serviceRequestId}/`;
+                                    }
+
+                                    function closeModal() {
+                                        document.getElementById('cancelModal').classList.add('hidden');
+                                    }
+                                </script>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-gray-500 dark:text-gray-400 text-center">
+                                No requests found.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+         
+        {% if service_requests %}
+  <div class="mt-6 flex justify-center space-x-4">
+    {% if service_requests.has_previous %}
+      <a href="?page={{ service_requests.previous_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+        Previous
+      </a>
+    {% endif %}
+
+    {% if service_requests.number > 1 %}
+      <a href="?page=1" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+        1
+      </a>
+      {% if service_requests.number > 3 %}
+        <span class="px-4 py-2 text-gray-900">...</span>
+      {% endif %}
+    {% endif %}
+
+    {% if service_requests.number > 2 %}
+      <a href="?page={{ service_requests.number|add:-1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+        {{ service_requests.number|add:-1 }}
+      </a>
+    {% endif %}
+
+    <span class="px-4 py-2 bg-blue-500 text-white rounded">{{ service_requests.number }}</span>
+
+    {% if service_requests.number < service_requests.paginator.num_pages %}
+      {% if service_requests.number < service_requests.paginator.num_pages|add:-1 %}
+        <a href="?page={{ service_requests.number|add:1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+          {{ service_requests.number|add:1 }}
+        </a>
+      {% endif %}
+    {% endif %}
+
+    {% if service_requests.number < service_requests.paginator.num_pages %}
+      {% if service_requests.number < service_requests.paginator.num_pages|add:-2 %}
+        <span class="px-4 py-2 text-gray-900">...</span>
+      {% endif %}
+      {% if service_requests.number != service_requests.paginator.num_pages %}
+        <a href="?page={{ service_requests.paginator.num_pages }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+          {{ service_requests.paginator.num_pages }}
+        </a>
+      {% endif %}
+    {% endif %}
+
+    {% if service_requests.has_next %}
+      <a href="?page={{ service_requests.next_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+        Next
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

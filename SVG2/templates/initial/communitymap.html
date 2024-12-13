@@ -1,0 +1,26 @@
+{% extends 'initial/index.html' %}
+
+{% load static tailwind_tags %}
+
+{% block title %}
+Community Map
+{% endblock %}
+
+{% block content %}
+<div class="m-8">
+    <div class="flex flex-col items-center justify-center my-4 space-y-4 animate_top">
+        <h2 class="text-4xl sm:text-6xl font-bold text-gray-900 text-center">
+           Community Map
+        </h2>
+        <p class="text-lg text-gray-600 text-center">Familiarize yourself with our community.</p>
+    </div>
+
+    <div class="flex items-center justify-center w-full">
+    <!-- Map Section -->
+    <div class="flex justify-center items-center w-full h-screen max-w-full">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1681.2637438439103!2d121.00101352746648!3d14.389607586485969!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sph!4v1733459327443!5m2!1sen!2sph&zoom=17"
+            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    </div>
+</div>
+{% endblock content %}

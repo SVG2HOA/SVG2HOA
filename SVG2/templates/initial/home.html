@@ -1,0 +1,132 @@
+{% extends 'initial/index.html' %}
+
+{% load static %}
+{% block title %}
+Home
+{% endblock %}
+{% block content %}
+
+<div class="lg:px-24 lg:py-24 md:py-20 md:px-44 px-4 py-24 items-center flex justify-center flex-col-reverse lg:flex-row md:gap-28 gap-16 bg-cover bg-no-repeat"
+style="background-image: url('{% static "images/bg10.jpg" %}'); height: 950px;">
+    <div class="pt-24 w-full relative pb-12 lg:pb-0">
+        <div class="relative">
+            <div class="absolute">
+                <div class="animate_top bg-white p-5 rounded-sm bg-opacity-90">
+                    <h1 class="my-2 text-green-800 font-bold text-6xl">
+                        SPRINGVILLE GARDENS 2
+                    </h1>
+                    <p class="my-2 text-black text-xl">Embrace the Essence of Home: Where Every Garden Flourishes</p>
+                    <button class ="sm:w-full lg:w-auto my-2 rounded-md py-3 px-6 text-center bg-green-600 text-white hover:bg-green-700 
+                    focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50"><a href="#features">Explore</a></button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<section id="features" class="pt-4">
+  <div class="container mx-auto px-4 2xl:px-12 mt-24">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Small Features Item -->
+      <div class="animate_top text-center space-y-4">
+        <div class="flex items-center justify-center w-20 h-20 bg-green-800 rounded-full mx-auto">
+          <img src="{% static 'images/comdev.png' %}" alt="Community Development Icon" class="w-14 h-14">
+        </div>
+        <div>
+          <h4 class="text-xl font-semibold text-gray-900">Community Development</h4>
+          <p class="text-gray-700">Elevating living spaces through continuous enhancements and beautification.</p>
+        </div>
+      </div>
+
+      <!-- Small Features Item -->
+      <div class="animate_top text-center space-y-4">
+        <div class="flex items-center justify-center w-20 h-20 bg-green-800 rounded-full mx-auto">
+          <img src="{% static 'images/relationships.png' %}" alt="Fruitful Relationships Icon" class="w-14 h-14">
+        </div>
+        <div>
+          <h4 class="text-xl font-semibold text-gray-900">Fruitful Relationships</h4>
+          <p class="text-gray-700">Cultivating strong, supportive bonds among residents.</p>
+        </div>
+      </div>
+
+      <!-- Small Features Item -->
+      <div class="animate_top text-center space-y-4">
+        <div class="flex items-center justify-center w-20 h-20 bg-green-800 rounded-full mx-auto">
+          <img src="{% static 'images/dynamic.png' %}" alt="Dynamic Management Icon" class="w-14 h-14">
+        </div>
+        <div>
+          <h4 class="text-xl font-semibold text-gray-900">Dynamic Management</h4>
+          <p class="text-gray-700">Adapting swiftly to ensure efficiency and resident satisfaction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+      <!-- ===== Small Features End ===== -->
+
+      <!-- ===== About Start ===== -->
+      <section class="ji gp uq 2xl:ud-py-35 pg">
+        <div class="bb ze ki xn wq">
+          <div class="tc wf gg qq">
+            <!-- About Images -->
+            <div class="animate_left xc gn gg jn/2 i">
+              <div>
+                <img src="{% static 'images/happiness.png' %}" alt="Shape" />
+              </div>
+            </div>
+
+            <!-- About Content -->
+            <div class="animate_right jn/2">
+              <h2 class="fk vj zp pr kk wm qb">We prioritize our residents' happiness by fostering a vibrant, supportive environment. </h2>
+              <p class="uo">Our community is thoughtfully designed to ensure that every aspect, from green spaces to communal areas, enhances your living experience. Beyond mere aesthetics, we embrace the essence of a connected and thriving neighborhood.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+<section  id="services" class="lj tp kr pt-12">
+    <!-- Section Title Start -->
+    <div
+      x-data="{ sectionTitle: `Our Services`, sectionTitleText: `We offer a comprehensive range of services designed to maintain and enhance community life, from meticulous landscaping and facility management to responsive resident support.`}"
+    >
+      <div class="animate_top bb ze rj ki xn vq">
+<h2
+        x-text="sectionTitle"
+        class="fk vj pr kk wm on/5 gq/2 bb _b"
+>
+</h2>
+<p class="bb on/5 wo/5 hq" x-text="sectionTitleText"></p>
+</div>
+
+
+    </div>
+    <!-- Section Title End -->
+
+    <div class="bb ze ki xn yq mb en">
+      <div class="wc qf pn xo ng py-10">
+        <!-- Service Item -->
+        <div class="animate_top sg oi pi zq ml il am cn _m">
+          <img src="{% static 'images/responsive.png' %}" alt="Icon" />
+          <h4 class="ek zj kk wm nb _b">Responsive Design</h4>
+          <p>Our website features a responsive design that adapts to all devices, ensuring an optimal viewing experience.</p>
+        </div>
+
+        <!-- Service Item -->
+        <div class="animate_top sg oi pi zq ml il am cn _m">
+          <img src="{% static 'images/essentials.png' %}" alt="Icon" />
+          <h4 class="ek zj kk wm nb _b">All Essential Sections</h4>
+          <p>We provide all the essential sections needed for easy navigation and comprehensive information, including FAQs, services, contact details, and community guidelines.</p>
+        </div>
+
+        <!-- Service Item -->
+        <div class="animate_top sg oi pi zq ml il am cn _m">
+          <img src="{% static 'images/updates.png' %}" alt="Icon" />
+          <h4 class="ek zj kk wm nb _b">Regular Updates</h4>
+          <p>Stay informed with regular updates that keep you connected to the latest news, events, and important announcements within our community.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock content%}

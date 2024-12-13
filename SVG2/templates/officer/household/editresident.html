@@ -1,0 +1,221 @@
+{% extends "officer/officer_base.html" %}
+
+{% load static %}
+
+{% block title %}
+Update Resident
+{% endblock title %}
+
+{% block content %}
+<div class="px-4 pt-16 lg:ml-64">
+  <nav class="flex py-4" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center mt-4 space-x-1 md:space-x-2 rtl:space-x-reverse">
+      <li class="inline-flex items-center">
+        <a href="{% url 'household_list' user.username %}"
+          class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+          Households
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+          </svg>
+          <a href="{% url 'view_household' user.username household.id %}" class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">Household ({{ household.owner_name.fname }} {{ household.owner_name.lname }})</a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m1 9 4-4-4-4" />
+          </svg>
+          <a href="{% url 'view_resident_info' user.username household.id resident.id %}"
+          class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">Resident
+            ({{ resident.first_name }} {{ resident.last_name }})</a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m1 9 4-4-4-4" />
+          </svg>
+          <p class="ms-1 text-sm font-medium text-gray-700 md:ms-2 dark:text-gray-400 dark:hover:text-white">Update Resident
+          </p>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <div class="rounded-lg pb-4"  style="background-image: url('{% static "images/formbg.png" %}'); height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;">
+ 
+    <div class="bg-white bg-opacity-95 p-4 rounded-lg h-full">
+        
+
+      <div class="w-full xl:inline-flex lg:inline-flex md:inline-flex items-center justify-between sm:inline-block">
+      <div class="fk kk inline-flex items-center">
+        <h2 class="text-3xl">{% if resident.id %} Update {% else %} New {% endif %} Resident</h2>
+      </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="space-y-12">
+        <div class="border-b border-gray-900/10 pb-12">
+          <div class="mt-10 grid gap-x-6 gap-y-8 sm:grid-cols-1 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8">
+              <div class="sm:md:col-span-2 lg:col-span-2 xl:col-span-2">
+                <label for="first_name" class="block text-sm font-medium leading-6 text-gray-900">First Name</label>
+                <div class="mt-2">
+                  <input type="text" name="first_name" id="first_name" {% if resident.id %} value="{{ form.first_name.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+            </div>
+
+              <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                  <label for="middle_name" class="block text-sm font-medium leading-6 text-gray-900">Middle Name</label>
+                  <div class="mt-2">
+                    <input type="text" name="middle_name" id="middle_name" {% if resident.id %} value="{{ form.middle_name.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+               </div>
+              </div>
+
+              <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                <label for="last_name" class="block text-sm font-medium leading-6 text-gray-900">Last Name</label>
+                <div class="mt-2">
+                  <input type="text" name="last_name" id="last_name" {% if resident.id %} value="{{ form.last_name.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+              </div>
+    
+              <div class="md:col-span-1 lg:col-span-2 xl:col-span-2">
+                <label for="suffix" class="block text-sm font-medium leading-6 text-gray-900">Suffix</label>
+                <div class="mt-2">
+                  <input type="text" name="suffix" id="suffix" {% if resident.id %} value="{{ form.suffix.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+              </div>
+
+              <div class="md:col-span-1 lg:col-span-1 xl:col-span-1">
+                  <label for="is_head_of_family" class="block text-sm font-medium leading-6 text-gray-900">Head</label>
+                  <div class="mt-2 w-h">
+                      <style>
+                          input[type="checkbox"] {
+                      width: 35px;
+                      height: 35px;
+                      border-radius: 0.375rem; /* equivalent to rounded-md */
+                      border: none; /* equivalent to border-0 */
+                      padding-top: 0.375rem; /* equivalent to py-1.5 */
+                      padding-bottom: 0.375rem; /* equivalent to py-1.5 */
+                      color: blue; /* equivalent to text-gray-900 */
+                      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5); /* equivalent to shadow-sm */
+                      box-sizing: border-box;
+                      outline: 0;
+                      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                      }
+                      .block:focus {
+                      border-color: #2563eb; /* equivalent to focus:ring-indigo-600 */
+                      box-shadow: 0 0 0 2px #e5e7eb, 0 0 0 3px rgba(66, 153, 225, 0.5); /* equivalent to focus:ring-2 and focus:ring-inset */
+                      }
+
+                      /* Styles for small screens */
+                      @media (min-width: 640px) {
+                      .block {
+                          font-size: 0.875rem; /* equivalent to sm:text-sm */
+                          line-height: 1.5rem; /* equivalent to sm:leading-6 */
+                      }
+                      }
+
+                      /* Placeholder color */
+                      .block::placeholder {
+                      color: #cbd5e0; /* equivalent to placeholder:text-gray-400 */
+                      }
+                      </style>
+                    {{ form.is_head_of_family }}
+                </div>
+              </div>
+
+              <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                  <label for="relation_to_head" class="block text-sm font-medium leading-6 text-gray-900">Relation to Head</label>
+                  <div class="mt-2">
+                    <input type="text" name="relation_to_head" id="relation_to_head" {% if resident.id %} value="{{ form.relation_to_head.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+               </div>
+              </div>   
+
+              
+              <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                  <label for="birthdate" class="block text-sm font-medium leading-6 text-gray-900">Birth Date</label>
+                  <div class="mt-2">
+                      <input type="date" name="birthdate" id="birthdate" value="{{ form.birthdate.value|date:'Y-m-d' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  </div>
+                </div>
+              
+                <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                  <label for="contact_number" class="block text-sm font-medium leading-6 text-gray-900">Contact Number</label>
+                  <div class="mt-2">
+                    <input type="text" name="contact_number" id="contact_number" {% if resident.id %} value="{{ form.contact_number.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+               </div>
+              </div>
+             
+              <div class="md:col-span-2 lg:col-span-1 xl:col-span-1">
+                <label for="gender" class="block text-sm font-medium leading-6 text-gray-900">Gender</label>
+                <div class="mt-2">
+                    <select id="gender" name="gender" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      {% for value, display_text in gender_choices %}
+                          <option value="{{ value }}" {% if resident.gender == value %} selected {% endif %}>{{ display_text }}</option>
+                      {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+                <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                  <label for="civil_status" class="block text-sm font-medium leading-6 text-gray-900">Civil Status</label>
+                  <div class="mt-2">
+                      <select id="civil_status" name="civil_status" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                          {% for value, display_text in civil_status_choices %}
+                          <option value="{{ value }}" {% if resident.civil_status == value %} selected {% endif %}>{{ display_text }}</option>
+                      {% endfor %}
+                      </select>
+                  </div>
+              </div>
+
+              
+              <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                  <label for="Email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
+                  <div class="mt-2">
+                    <input type="text" name="email" id="email" {% if resident.id %} value="{{ form.email.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+               </div>
+              </div>
+
+               <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                  <label for="religion" class="block text-sm font-medium leading-6 text-gray-900">Religion</label>
+                  <div class="mt-2">
+                      <select id="religion" name="religion" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                          {% for value, display_text in religion_choices %}
+                          <option value="{{ value }}" {% if resident.religion == value %} selected {% endif %}>{{ display_text }}</option>
+                      {% endfor %}
+                      </select>
+                  </div>
+              </div>
+
+              <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
+                <label for="educational_attainment" class="block text-sm font-medium leading-6 text-gray-900">Educational Attainment</label>
+                <div class="mt-2">
+                    <select id="educational_attainment" name="educational_attainment" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        {% for value, display_text in educational_attainment_choices %}
+                        <option value="{{ value }}" {% if resident.educational_attainment == value %} selected {% endif %}>{{ display_text }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+                </div>
+          </div>
+        </div>
+      <div class="mt-6 flex items-center justify-start gap-x-6">
+        <a href="{% url 'view_resident_info' user.username household.id resident.id %}"
+          class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-500">Cancel</a>
+          <button type="submit"><span
+              class="rounded-md bg-green-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Save</span></button>
+      </div>
+  </form>
+</div>
+</div>
+</div>
+{% endblock %}

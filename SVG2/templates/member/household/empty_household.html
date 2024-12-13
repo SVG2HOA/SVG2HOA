@@ -1,0 +1,12 @@
+{% extends "member/base.html" %}
+
+{% block content %}
+<div class="px-4 pt-16 sm:ml-64">
+  <div class="p-4 rounded-lg">
+<h2>Household for {{ user.get_full_name|default:user.username }}</h2>
+  <p>No household data available.</p>
+    <a href="{% url 'add_household' username=user.username %}" class="text-blue-500">Add Household Data</a>
+
+</div>
+</div>
+{% endblock %}

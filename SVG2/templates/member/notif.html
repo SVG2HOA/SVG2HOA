@@ -1,0 +1,70 @@
+{% extends "member/base.html" %}
+
+{% block title %}
+Notifications
+{% endblock title %}
+
+{% block content %}
+<div class="px-4 pt-16 sm:ml-64">
+  <div class="p-4 dark:border-gray-700">
+    <div class="w-full flex flex-wrap items-center justify-between sm:inline-block mt-4 mb-4">
+      <div class="w-full sm:w-auto text-center sm:text-left">
+          <h3 class="text-3xl font-semibold leading-7 text-gray-900 mr-5">
+              Notifications
+            </h3>
+      </div>
+  </div>
+    {% if notifications %}
+    <ul class="space-y-4">
+      {% for notification in notifications %}
+        <li class="p-4 shadow-md rounded-md 
+                  {% if not notification.read %} bg-green-200 {% else %} bg-white {% endif %}">
+                  <div class="flex justify-between items-center">
+          <p class="font-medium text-gray-800">{{ notification.content }}</p>
+          <p class="text-sm text-gray-500">{{ notification.created_at|date:"M d, Y H:i" }}</p>
+        </div>
+          {% if not notification.read %}
+          <form action="{% url 'mark_as_read' user.username notification.id %}" method="POST" class="mt-2">
+            {% csrf_token %}
+            <button type="submit"><span class="text-sm text-red-500 hover:text-red-300 rounded-md">
+              Mark as read 
+            </span></button>
+          </form>
+          {% else %}
+          <p class="text-sm text-gray-400 mt-2">Read</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    
+    <div class="mt-6 flex justify-center space-x-4">
+      {% if notifications.has_previous %}
+      <a href="?page={{ notifications.previous_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+        Previous
+      </a>
+      {% endif %}
+    
+      {% for page_num in notifications.paginator.page_range %}
+        {% if notifications.number == page_num %}
+        <span class="px-4 py-2 bg-blue-500 text-white rounded">{{ page_num }}</span>
+        {% else %}
+        <a href="?page={{ page_num }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+          {{ page_num }}
+        </a>
+        {% endif %}
+      {% endfor %}
+    
+      {% if notifications.has_next %}
+      <a href="?page={{ notifications.next_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+        Next
+      </a>
+      {% endif %}
+    </div>
+    
+    
+    {% else %}
+    <p>No new notifications.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
