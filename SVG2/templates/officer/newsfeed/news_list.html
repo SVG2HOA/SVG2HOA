@@ -28,12 +28,12 @@ News & Notices
 
         <!-- Announcements Section -->
         <div class="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-4 flex flex-col h-full">
-          <div class="w-full flex justify-between md:justify-center gap-y-2 sm:flex-row md:flex-col lg:flex-col xl:flex-row  xl:justify-between items-center mb-4">
+          <div class="w-full flex justify-center sm:justify-between gap-y-2 flex-col sm:flex-row items-center mb-4">
             <div class="flex">
               <h3 class="text-4xl font-semibold leading-7 text-gray-900">Announcement</h3>
             </div>
             <a href="{% url 'create_announcement' user.username %}"
-              class="bg-green-700 hover:bg-green-600 text-white font-bold px-5 py-2 my-4 sm:m-0 rounded-lg flex items-center space-x-2">
+              class="bg-green-700 hover:bg-green-600 text-white font-bold pl-1 pr-2 py-2 my-4 sm:m-0 rounded-lg flex items-center space-x-2">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6">
                 <path fill-rule="evenodd"
                   d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
@@ -150,12 +150,12 @@ class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-cen
         </div>
 
         <div class="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-4 flex flex-col h-full">
-          <div class="w-full flex justify-between md:justify-center gap-y-2 sm:flex-row md:flex-col lg:flex-col xl:flex-row  xl:justify-between items-center mb-4">
+          <div class="w-full flex justify-center sm:justify-between gap-y-2 flex-col sm:flex-row items-center mb-4">
             <div class="flex">
               <h3 class="text-4xl font-semibold leading-7 text-gray-900">News Articles</h3>
             </div>
             <a href="{% url 'add_news' username=user.username %}"
-              class="bg-green-700 hover:bg-green-600 text-white font-bold px-5 py-2 my-4 sm:m-0 rounded-lg flex items-center space-x-2">
+            class="bg-green-700 hover:bg-green-600 text-white font-bold pl-1 pr-2 py-2 my-4 sm:m-0 rounded-lg flex items-center space-x-2">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6">
                 <path fill-rule="evenodd"
                   d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
