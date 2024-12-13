@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 import base64
 from pathlib import Path
 from django.conf import settings
@@ -93,10 +94,9 @@ WSGI_APPLICATION = 'HOA_MIS.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'postgresql://svg2hoadatabase_7luy_user:vp8uFUqwBvBEmAc7pmfu2SSOhFV8lOHZ@dpg-ctdf2t1opnds73akru3g-a.singapore-postgres.render.com/svg2hoadatabase_7luy')
+    )
 }
 
 AUTH_USER_MODEL = 'SVG2.User'
