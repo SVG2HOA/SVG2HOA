@@ -110,6 +110,7 @@ urlpatterns = [
     #officer notifications
     path('officer/<username>/dashboard/', OfficerNotificationsView.as_view(), name='OfficerNotificationsView'),
     path('mark_as_read/<int:notification_id>/', views.mark_as_read, name='mark_as_read'),
+    path('mark_all_as_read/', views.mark_all_as_read, name='mark_all_as_read'),
 
     path("<username>/household/billing/<int:billing_id>/", create_payment_link, name="create_payment_link"),
 

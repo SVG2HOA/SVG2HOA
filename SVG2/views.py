@@ -1335,6 +1335,13 @@ def eventscalendar(request, username, year=None, month=None):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def officer_landing_page(request, username):
+    user = request.user
+    
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)  # Redirect to profile update page
+
     total_households = Household.objects.count()
     total_residents = Resident.objects.count()
     pending_reservations = Reservation.objects.filter(status='Pending').count()
@@ -1411,6 +1418,12 @@ def officer_landing_page(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def news_feed(request, username):
+    user = request.user
+    
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)  # Redirect to profile update page
     # Retrieve newsfeeds and announcements
     newsfeeds = Newsfeed.objects.all().order_by('-created_at')
     announcements = Announcement.objects.all().order_by('-date', '-time')
@@ -1630,6 +1643,17 @@ class HouseholdListView(RoleRequiredMixin, ListView):
     model = Household
     template_name = 'officer/household/household_list.html'
     context_object_name = 'households'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user's profile is updated
+        if not request.user.fname or not request.user.lname:
+            messages.warning(
+                request, 
+                "Update your profile first!", 
+                extra_tags="officer_update_prof"
+            )
+            return redirect(reverse('officer_update_profile', kwargs={'username': request.user.username}))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = Household.objects.prefetch_related('billings').annotate(
@@ -1973,6 +1997,17 @@ class ReservationListView(RoleRequiredMixin, ListView):
     template_name = 'officer/reservation/reservation_list.html'
     context_object_name = 'reservations'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user's profile is updated
+        if not request.user.fname or not request.user.lname:
+            messages.warning(
+                request, 
+                "Update your profile first!", 
+                extra_tags="officer_update_prof"
+            )
+            return redirect(reverse('officer_update_profile', kwargs={'username': request.user.username}))
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
@@ -2066,6 +2101,17 @@ class RequestListView(RoleRequiredMixin, ListView):
     model = ServiceRequest
     template_name = 'officer/services/request_list.html'
     context_object_name = 'servicerequests'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user's profile is updated
+        if not request.user.fname or not request.user.lname:
+            messages.warning(
+                request, 
+                "Update your profile first!", 
+                extra_tags="officer_update_prof"
+            )
+            return redirect(reverse('officer_update_profile', kwargs={'username': request.user.username}))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -2167,6 +2213,17 @@ class AppointmentListView(RoleRequiredMixin, ListView):
     template_name = 'officer/grievance/appointment_list.html'
     context_object_name = 'grievance_appointments'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user's profile is updated
+        if not request.user.fname or not request.user.lname:
+            messages.warning(
+                request, 
+                "Update your profile first!", 
+                extra_tags="officer_update_prof"
+            )
+            return redirect(reverse('officer_update_profile', kwargs={'username': request.user.username}))
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
@@ -2264,9 +2321,12 @@ def update_appointment_status(request, username, grievanceappointment_id):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def manage_users(request, username):
-    if not request.user.is_officer:
-        return redirect('dashboard')  # Only officers can access
-
+    user = request.user
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)  # Redirect to profile update page
+        
     # Get search query from request
     search_query = request.GET.get('search', '')
 
@@ -2414,6 +2474,13 @@ def officer_delete_profile(request, pk):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def events_calendar(request, username, year=None, month=None): 
+    user = request.user
+    
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)  # Redirect to profile update page
+
     today = date.today()
 
     # Check if a month is selected from the input form
@@ -2465,9 +2532,15 @@ class OfficerNotificationsView(RoleRequiredMixin, View):
             'notifications': notifications
         })
 
+@login_required
 def mark_as_read(request, notification_id):
     notification = Notification.objects.get(id=notification_id, recipient=request.user)
     notification.read = True
     notification.save()
     return redirect(request.META.get('HTTP_REFERER'))
 
+@login_required
+def mark_all_as_read(request):
+    # Update all notifications for the logged-in user to mark them as read
+    Notification.objects.filter(recipient=request.user, read=False).update(read=True)
+    return redirect(request.META.get('HTTP_REFERER', '/'))

@@ -29,6 +29,18 @@ Update Profile
  
     <div class="bg-white bg-opacity-95 p-4 rounded-lg h-full">
         
+      {% if messages %}
+      <ul class="messages text-center text-green-500 text-lg font-semibold mt-2">
+          {% for message in messages %}
+              {% if "officer_update_prof" in message.tags %}
+                  <li
+                      {% if message.tags %} class="{{ message.tags }}"
+                      {% endif %}>{{ message.message }}
+                  </li>
+              {% endif %}
+          {% endfor %}
+      </ul>
+  {% endif %}
 
       <div class="w-full xl:inline-flex lg:inline-flex md:inline-flex items-center justify-between sm:inline-block">
         <div class="fk kk inline-flex items-center">
