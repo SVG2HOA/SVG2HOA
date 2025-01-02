@@ -808,25 +808,52 @@ def make_reservation(request, username):
     if request.method == 'POST':
         form = ReservationForm(request.POST)
         if form.is_valid():
+            reservation_date = form.cleaned_data.get('reservation_date')
+            reservation_start = form.cleaned_data.get('reservation_time_start')
+            reservation_end = form.cleaned_data.get('reservation_time_end')
+
+            # Check if the reservation date is in the past
+            if reservation_date and reservation_date < date.today():
+                messages.error(request, "Reservation date cannot be in the past.")
+                return redirect('make_reservation', username=username)
+
+            # Check if the start time is before the end time
+            if reservation_start and reservation_end and reservation_start >= reservation_end:
+                messages.error(request, "Start time must be before end time.")
+                return redirect('make_reservation', username=username)
+
+            # Check for existing reservations with the same date and time
+            existing_reservation = Reservation.objects.filter(
+                household=household,
+                reservation_date=reservation_date,
+                reservation_time_start__lt=reservation_end,
+                reservation_time_end__gt=reservation_start
+            ).exists()
+
+            if existing_reservation:
+                messages.error(request, "A reservation already exists for this time slot.")
+                return redirect('make_reservation', username=username)
+
+            # Save the reservation
             reservation = form.save(commit=False)
-            # Assign the household instance, not the user
             reservation.household = household
             reservation.save()
-            
+
+            # Success message for creating reservation
             messages.success(request, "Reservation created successfully!", extra_tags="reservation_created")
+
             # Create a notification for all officers, except the user who made the reservation
-            officers = User.objects.filter(is_officer=True)
+            officers = User.objects.filter(is_officer=True).exclude(id=user.id)
             for officer in officers:
-                notification = Notification.objects.create(
+                Notification.objects.create(
                     recipient=officer,  # Link to officer directly
                     content=f"A new reservation has been made by {user.fname} {user.lname} for the household {household.owner_name}.",
                     created_at=timezone.now()  # Use current time for the notification
                 )
-                notification.save()
 
-            messages.success(request, 'Reservation created successfully!')
-            # Redirect to a success page or the same page with a success message
-            return redirect('make_reservation', username=username)  # Adjust the redirect as needed
+            # Redirect to the same page or another page with the success message
+            return redirect('make_reservation', username=username)
+
     else:
         form = ReservationForm()
 
@@ -843,26 +870,56 @@ def make_reservation(request, username):
 def update_reservation(request, username, request_id):
     reservation = get_object_or_404(Reservation, id=request_id)
     user = request.user
-    
+    household = reservation.household  # Get the household associated with the reservation
+
     if request.method == 'POST':
         form = ReservationForm(request.POST, request.FILES, instance=reservation)
         if form.is_valid():
+            # Get cleaned data
+            reservation_date = form.cleaned_data.get('reservation_date')
+            reservation_start = form.cleaned_data.get('reservation_time_start')
+            reservation_end = form.cleaned_data.get('reservation_time_end')
+
+            # Check if the reservation date is in the past
+            if reservation_date and reservation_date < date.today():
+                messages.error(request, "Reservation date cannot be in the past.")
+                return redirect('update_reservation', username=username, request_id=request_id)
+
+            # Check if the start time is before the end time
+            if reservation_start and reservation_end and reservation_start >= reservation_end:
+                messages.error(request, "Start time must be before end time.")
+                return redirect('update_reservation', username=username, request_id=request_id)
+
+            # Check for overlapping reservations with the same details
+            existing_reservation = Reservation.objects.filter(
+                household=household,
+                reservation_date=reservation_date,
+                reservation_time_start__lt=reservation_end,
+                reservation_time_end__gt=reservation_start
+            ).exclude(id=reservation.id).exists()  # Exclude the current reservation
+
+            if existing_reservation:
+                messages.error(request, "A reservation already exists for this time slot.")
+                return redirect('update_reservation', username=username, request_id=request_id)
+
+            # Save the form if no conflict is found
             form.save()
-            
+
+            # Success message for updating reservation
             messages.success(request, "Reservation updated successfully!", extra_tags="reservation_updated")
+
             # Create a notification for all officers, except the user who updated the reservation
-            officers = User.objects.filter(is_officer=True)
+            officers = User.objects.filter(is_officer=True).exclude(id=user.id)
             for officer in officers:
-                notification = Notification.objects.create(
-                    recipient=officer,  # Link to officer directly
+                Notification.objects.create(
+                    recipient=officer,
                     content=f"The reservation for household {reservation.household.owner_name} has been updated by {user.fname} {user.lname}.",
                     created_at=timezone.now()  # Use current time for the notification
                 )
-                notification.save()
 
-            messages.success(request, 'Reservation updated successfully!')
-            # Redirect to a success page or the same page with a success message
-            return redirect('update_reservation', username=username, request_id=request_id)  # Use 'request_id'
+            # Redirect to the same page with a success message or another page
+            return redirect('update_reservation', username=username, request_id=request_id)
+
     else:
         form = ReservationForm(instance=reservation)
 
@@ -975,11 +1032,22 @@ def submit_request(request, username):
         form = ServiceRequestForm(request.POST, request.FILES)
         if form.is_valid():
             service_request = form.save(commit=False)
+            # Check for duplicate service requests (same service type and title)
+            existing_request = ServiceRequest.objects.filter(
+                household=household,
+                service_type=service_request.service_type,
+                title=service_request.title,
+                description=service_request.description
+            ).exists()
+
+            if existing_request:
+                messages.error(request, "A similar service request already exists.")
+                return redirect('submit_request', username=username)
+
             # Assign the household instance, not the user
             service_request.household = household
             service_request.save()
 
-            
             messages.success(request, "Request created successfully!", extra_tags="request_created")
             # Create a notification for all officers
             officers = User.objects.filter(is_officer=True)
@@ -991,8 +1059,6 @@ def submit_request(request, username):
                 )
                 notification.save()
 
-            messages.success(request, 'Request created successfully!')
-            # Redirect to a success page or the same page with a success message
             return redirect('submit_request', username=username)
     else:
         form = ServiceRequestForm()
@@ -1009,9 +1075,27 @@ def submit_request(request, username):
 @user_passes_test(is_member, login_url='/login')
 def update_request(request, username, request_id):
     service_request = get_object_or_404(ServiceRequest, id=request_id)
+    household = service_request.household  # Get the household instance
     if request.method == 'POST':
         form = ServiceRequestForm(request.POST, request.FILES, instance=service_request)
         if form.is_valid():
+            # Get cleaned data
+            service_type = form.cleaned_data.get('service_type')
+            title = form.cleaned_data.get('title')
+            description = form.cleaned_data.get('description')
+
+            # Check for duplicate service requests (same service type, title, and description)
+            existing_request = ServiceRequest.objects.filter(
+                household=household,
+                service_type=service_type,
+                title=title,
+                description=description
+            ).exclude(id=service_request.id).exists()  # Exclude the current request
+
+            if existing_request:
+                messages.error(request, "A similar service request already exists.")
+                return redirect('update_request', username=username, request_id=request_id)
+
             form.save()
 
             messages.success(request, "Request updated successfully!", extra_tags="request_updated")
@@ -1025,11 +1109,10 @@ def update_request(request, username, request_id):
                 )
                 notification.save()
 
-            messages.success(request, 'Request updated successfully!')
             return redirect('update_request', username=username, request_id=request_id)
     else:
-        form = ServiceRequestForm(instance=service_request, initial={'image': service_request.image})
-    
+        form = ServiceRequestForm(instance=service_request)
+
     return render(request, 'member/services/update_request.html', {'form': form, 'service_request': service_request})
 
 @login_required
@@ -1131,11 +1214,22 @@ def make_appointment(request, username):
     if request.method == 'POST':
         form = GrievanceForm(request.POST, request.FILES)
         if form.is_valid():
+            reservation_date = form.cleaned_data.get('reservation_date')
+
+            # Check for existing appointment for the same household on the same date
+            existing_appointment = GrievanceAppointment.objects.filter(
+                household=household,
+                reservation_date=reservation_date
+            ).exists()
+
+            if existing_appointment:
+                messages.error(request, "An appointment already exists for this date.")
+                return redirect('make_appointment', username=username)
+
             grievance_appointment = form.save(commit=False)
             grievance_appointment.household = household
             grievance_appointment.save()
 
-            
             messages.success(request, "Appointment created successfully!", extra_tags="appointment_created")
             # Create a notification for all officers
             officers = User.objects.filter(is_officer=True)
@@ -1164,18 +1258,32 @@ def make_appointment(request, username):
 @user_passes_test(is_member, login_url='/login')
 def update_appointment(request, username, request_id):
     grievance_appointment = get_object_or_404(GrievanceAppointment, id=request_id)
+    user = request.user
+    household = grievance_appointment.household  # Get the household associated with the appointment
+
     if request.method == 'POST':
         form = GrievanceForm(request.POST, request.FILES, instance=grievance_appointment)
         if form.is_valid():
+            reservation_date = form.cleaned_data.get('reservation_date')
+
+            # Check for existing appointment for the same household on the same date (excluding current appointment)
+            existing_appointment = GrievanceAppointment.objects.filter(
+                household=household,
+                reservation_date=reservation_date
+            ).exclude(id=grievance_appointment.id).exists()
+
+            if existing_appointment:
+                messages.error(request, "An appointment already exists for this date.")
+                return redirect('update_appointment', username=username, request_id=request_id)
+
             form.save()
 
-            
             messages.success(request, "Appointment updated successfully!", extra_tags="appointment_updated")
             # Create a notification for all officers
             officers = User.objects.filter(is_officer=True)
             for officer in officers:
                 notification = Notification.objects.create(
-                    recipient=officer,  # Send notification to officer
+                    recipient=officer,
                     content=f"The appointment #{grievance_appointment.id} has been updated by {request.user.fname} {request.user.lname}.",
                     created_at=timezone.now()
                 )
@@ -1184,9 +1292,13 @@ def update_appointment(request, username, request_id):
             messages.success(request, 'Appointment updated successfully!')
             return redirect('update_appointment', username=username, request_id=request_id)
     else:
-        form = GrievanceForm(instance=grievance_appointment, initial={'image': grievance_appointment.image})
-    return render(request, 'member/grievance/update_appointment.html', {'form': form, 'grievance_appointment': grievance_appointment})
+        form = GrievanceForm(instance=grievance_appointment)
 
+    return render(request, 'member/grievance/update_appointment.html', {
+        'form': form,
+        'grievance_appointment': grievance_appointment,
+    })
+    
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def cancel_appointment(request, username, request_id):
@@ -1224,12 +1336,25 @@ def member_profile_info(request, username):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def member_update_profile(request, username):
-    user = User.objects.get(username=username) 
+    user = User.objects.get(username=username)
 
     if request.method == 'POST':
         form = MemberChangeForm(request.POST, request.FILES, instance=user)
+
+        # Check for duplicate username
+        new_username = form.cleaned_data.get('username')
+        if new_username and User.objects.filter(username=new_username).exists():
+            messages.error(request, "The username you entered is already taken.")
+            return render(request, 'member/profile/profile_update.html', {'form': form})
+
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            
+            # Update username_changed timestamp when username is changed
+            if user.username != username:
+                user.username_changed = timezone.now()
+            
+            user.save()
 
             messages.success(request, "Profile updated successfully!", extra_tags="profile_updated")
             # Send notifications to all officers
@@ -1241,7 +1366,7 @@ def member_update_profile(request, username):
                     created_at=timezone.now()
                 )
                 notification.save()
-            return redirect('member_profile_info', username=user.username)  # Ensure this view and URL are correctly configured
+            return redirect('member_profile_info', username=user.username)
     else:
         form = MemberChangeForm(instance=user)
 
@@ -1754,6 +1879,88 @@ class HouseholdListView(RoleRequiredMixin, ListView):
         context['sort_by'] = sort_by
         context['direction'] = direction
         context['search_query'] = self.request.GET.get('search', '')
+
+        return context
+
+class ResidentListView(RoleRequiredMixin, ListView):
+    allowed_roles = ['is_officer']
+    model = Resident
+    template_name = 'officer/household/resident_list.html'
+    context_object_name = 'residents'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user's profile is updated
+        if not request.user.fname or not request.user.lname:
+            messages.warning(
+                request, 
+                "Update your profile first!", 
+                extra_tags="officer_update_prof"
+            )
+            return redirect(reverse('officer_update_profile', kwargs={'username': request.user.username}))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Start with the base queryset
+        queryset = Resident.objects.all().select_related('household')
+
+        # Handle search
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(household__owner_name__lname__icontains=search_query) |
+                Q(household__block__icontains=search_query) |
+                Q(household__street__icontains=search_query) |
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query) |
+                Q(email__icontains=search_query)
+            )
+
+        # Handle sorting
+        sort_by = self.request.GET.get('sort', 'household')
+        direction = self.request.GET.get('direction', 'asc')
+
+        if sort_by == 'block':
+            sort_by = 'household__block'
+        elif sort_by == 'street':
+            sort_by = 'household__street'
+        elif sort_by == 'household':
+            sort_by = 'household__owner_name__lname'
+        elif sort_by == 'first_name':
+            sort_by = 'first_name'
+        elif sort_by == 'last_name':
+            sort_by = 'last_name'
+
+        if direction == 'desc':
+            queryset = queryset.order_by(f'-{sort_by}')
+        else:
+            queryset = queryset.order_by(sort_by)
+
+        return queryset
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get filtered and sorted queryset
+        residents_queryset = self.get_queryset()
+
+        # Add pagination
+        paginator = Paginator(residents_queryset, 6)  # Show 6 residents per page
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Handle sorting by overall billing status
+        sort_by = self.request.GET.get('sort', 'household')
+        direction = self.request.GET.get('direction', 'asc')
+
+        # Add context for pagination and sorting
+        context['residents'] = page_obj
+        context['sort_by'] = sort_by
+        context['direction'] = direction
+        context['search_query'] = self.request.GET.get('search', '')
+
+        # Add household id for each resident
+        context['household_ids'] = {resident.id: resident.household.id for resident in residents_queryset}
 
         return context
 
@@ -2443,13 +2650,27 @@ def officer_update_profile(request, username):
 
     if request.method == 'POST':
         form = OfficerChangeForm(request.POST, request.FILES, instance=user)
+
+        # Check for duplicate username
+        new_username = form.cleaned_data.get('username')
+        if new_username and User.objects.filter(username=new_username).exists():
+            messages.error(request, "The username you entered is already taken.")
+            return render(request, 'officer/profile/profile_update.html', {
+                'form': form,
+                'roles_choices': available_roles_choices
+            })
+
         if form.is_valid():
-            form.save()  # Ensure the form is valid before saving
+            user = form.save(commit=False)
             
+            # Update username_changed timestamp when username is changed
+            if user.username != username:
+                user.username_changed = timezone.now()
+            
+            user.save()
+
             messages.success(request, "Profile updated successfully!", extra_tags="profile_updated")
             return redirect('officer_profile_info', username=user.username)
-        else:
-            print(form.errors)  # Debugging: check form errors
     else:
         form = OfficerChangeForm(instance=user)
 

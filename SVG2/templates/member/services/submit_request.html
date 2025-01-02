@@ -40,12 +40,15 @@ New Request
       </div>
     </div>
     {% if messages %}
-    <ul class="messages text-center text-green-500 text-lg font-semibold mt-2">
+    <ul class="messages text-center text-lg font-semibold mt-2">
         {% for message in messages %}
-            {% if "request_created" in message.tags %}
-                <li
-                    {% if message.tags %} class="{{ message.tags }}"
-                    {% endif %}>{{ message.message }}
+            {% if "error" in message.tags %}
+                <li class="text-red-500">
+                    {{ message.message }}
+                </li>
+            {% elif "request_created" in message.tags %}
+                <li class="text-green-500">
+                    {{ message.message }}
                 </li>
             {% endif %}
         {% endfor %}

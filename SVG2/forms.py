@@ -219,18 +219,6 @@ class ReservationForm(forms.ModelForm):
         model = Reservation
         fields = ['amenities', 'reservation_date', 'reservation_time_start', 'reservation_time_end', 'message']
     
-    def clean(self):
-        cleaned_data = super().clean()
-        reservation_date = cleaned_data.get("reservation_date")
-        reservation_start = cleaned_data.get("reservation_time_start")
-        reservation_end = cleaned_data.get("reservation_time_end")
-        
-        if reservation_date and reservation_date < date.today():
-            raise ValidationError("Reservation date cannot be in the past.")
-        
-        if reservation_start and reservation_end and reservation_start >= reservation_end:
-            raise ValidationError("Start time must be before end time.")
-    
 class ReservationStatusForm(forms.ModelForm):
     class Meta:
         model = Reservation

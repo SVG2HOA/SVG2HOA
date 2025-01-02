@@ -30,12 +30,15 @@ Update User Profile
     <div class="bg-white bg-opacity-95 p-4 rounded-lg h-full">
         
       {% if messages %}
-      <ul class="messages text-center text-green-500 text-lg font-semibold mt-2">
+      <ul class="messages text-center text-lg font-semibold mt-2">
           {% for message in messages %}
-              {% if "update_prof" in message.tags %}
-                  <li
-                      {% if message.tags %} class="{{ message.tags }}"
-                      {% endif %}>{{ message.message }}
+              {% if "error" in message.tags %}
+                  <li class="text-red-500">
+                      {{ message.message }}
+                  </li>
+              {% elif "update_prof" in message.tags %}
+                  <li class="text-green-500">
+                      {{ message.message }}
                   </li>
               {% endif %}
           {% endfor %}

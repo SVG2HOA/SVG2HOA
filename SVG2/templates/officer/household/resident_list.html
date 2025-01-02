@@ -1,0 +1,175 @@
+{% extends 'officer/officer_base.html' %}
+{% load static %}
+{% block title %}
+Resident List
+{% endblock title %}
+
+{% block content %}
+<div class="pt-16 lg:ml-64">
+    <div class="p-4 rounded-lg">
+
+        <div class="w-full flex flex-wrap items-center justify-between sm:inline-block mt-2">
+            <div class="w-full sm:w-auto text-center sm:text-left">
+                <h3 class="text-3xl font-semibold leading-7 text-gray-900 mr-5">
+                    Residents
+                  </h3>
+            </div>
+        </div>
+
+        <div class="w-full flex flex-wrap items-center justify-between sm:flex-start mt-4 mb-2 gap-4">
+            <div class="w-full sm:w-auto sm:mt-0 flex flex-wrap items-center gap-4 justify-center sm:justify-start">
+                <form method="GET" action="" class="w-full sm:w-auto">
+            <div class="relative">
+                <input type="text" name="search" value="{{ search_query }}"
+                    class="block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Search">
+                <button type="submit" class="absolute right-0 top-0 mt-2 mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="size-6">
+                        <path fill-rule="evenodd"
+                            d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+        </div>
+        <form method="GET" action="" class="w-full sm:w-auto">
+            <div class="flex items-center justify-between">
+                <label for="sort" class="mr-2">Sort by:</label>
+                <select name="sort" id="sort"
+                    class="px-4 py-1 pr-9 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    onchange="this.form.submit()">
+                    <option value="household" {% if sort_by == 'household' %}selected{% endif %}>Household</option>
+                    <option value="block" {% if sort_by == 'block' %}selected{% endif %}>Block</option>
+                    <option value="street" {% if sort_by == 'street' %}selected{% endif %}>Street</option>
+                    <option value="first_name" {% if sort_by == 'first_name' %}selected{% endif %}>First Name</option>
+                    <option value="last_name" {% if sort_by == 'last_name' %}selected{% endif %}>Last Name</option>
+                </select>
+                <button type="submit" name="direction"
+                    value="{% if direction == 'asc' %}desc{% else %}asc{% endif %}"
+                    class="ml-2 px-4 py-2 text-gray-500 hover:text-gray-700">
+                    {% if direction == 'asc' %}
+                    Ascending ↑
+                    {% else %}
+                    Descending ↓
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+        <div class="relative shadow-md sm:rounded-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+                    <thead
+                        class="text-md text-white uppercase bg-green-700 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8 rounded-tl-lg">
+                            Name
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            Household
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            Block
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            Street
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            Email
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8 rounded-tr-lg">
+                            Contact Number
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800">
+                            {% for resident in residents %}
+                                <tr class="border-b text-gray-700 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <th scope="row" class="px-6 py-4 text-gray-900 font-semibold whitespace-nowrap dark:text-white">
+                                        <a href="{% url 'view_resident_info' username=request.user.username pk=resident.household.id resident_id=resident.id %}" class="font-medium hover:text-blue-600">{{ resident.first_name }} {{ resident.last_name }}</a>
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        {{ resident.household.owner_name.lname }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ resident.household.block }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ resident.household.street }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ resident.email }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ resident.contact_number }}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                                    No residents found.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if residents %}
+        <div class="mt-6 flex justify-center space-x-4">
+          {% if residents.has_previous %}
+            <a href="?page={{ residents.previous_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+              Previous
+            </a>
+          {% endif %}
+      
+          {% if residents.number > 1 %}
+            <a href="?page=1" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+              1
+            </a>
+            {% if residents.number > 3 %}
+              <span class="px-4 py-2 text-gray-900">...</span>
+            {% endif %}
+          {% endif %}
+      
+          {% if residents.number > 2 %}
+            <a href="?page={{ residents.number|add:-1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+              {{ residents.number|add:-1 }}
+            </a>
+          {% endif %}
+      
+          <span class="px-4 py-2 bg-blue-500 text-white rounded">{{ residents.number }}</span>
+      
+          {% if residents.number < residents.paginator.num_pages %}
+            {% if residents.number < residents.paginator.num_pages|add:-1 %}
+              <a href="?page={{ residents.number|add:1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+                {{ residents.number|add:1 }}
+              </a>
+            {% endif %}
+          {% endif %}
+      
+          {% if residents.number < residents.paginator.num_pages %}
+            {% if residents.number < residents.paginator.num_pages|add:-2 %}
+              <span class="px-4 py-2 text-gray-900">...</span>
+            {% endif %}
+            {% if residents.number != residents.paginator.num_pages %}
+              <a href="?page={{ residents.paginator.num_pages }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+                {{ residents.paginator.num_pages }}
+              </a>
+            {% endif %}
+          {% endif %}
+      
+          {% if residents.has_next %}
+            <a href="?page={{ residents.next_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+              Next
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+</div>
+{% endblock %}

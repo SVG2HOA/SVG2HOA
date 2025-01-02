@@ -2306,6 +2306,11 @@ select {
   color: rgb(161 98 7 / var(--tw-text-opacity, 1));
 }
 
+.text-yellow-200 {
+  --tw-text-opacity: 1;
+  color: rgb(254 240 138 / var(--tw-text-opacity, 1));
+}
+
 .underline {
   text-decoration-line: underline;
 }
@@ -2673,6 +2678,11 @@ select {
   border-color: rgb(59 130 246 / var(--tw-border-opacity, 1));
 }
 
+.focus\:text-yellow-200:focus {
+  --tw-text-opacity: 1;
+  color: rgb(254 240 138 / var(--tw-text-opacity, 1));
+}
+
 .focus\:underline:focus {
   text-decoration-line: underline;
 }
@@ -2764,12 +2774,27 @@ select {
   outline-color: #16a34a;
 }
 
+.active\:text-yellow-200:active {
+  --tw-text-opacity: 1;
+  color: rgb(254 240 138 / var(--tw-text-opacity, 1));
+}
+
 .group:hover .group-hover\:block {
   display: block;
 }
 
 .group:hover .group-hover\:bg-opacity-0 {
   --tw-bg-opacity: 0;
+}
+
+.group:hover .group-hover\:text-yellow-200 {
+  --tw-text-opacity: 1;
+  color: rgb(254 240 138 / var(--tw-text-opacity, 1));
+}
+
+.group:focus .group-focus\:text-yellow-200 {
+  --tw-text-opacity: 1;
+  color: rgb(254 240 138 / var(--tw-text-opacity, 1));
 }
 
 @media not all and (min-width: 1024px) {

@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import LoginSignupView, member_landing_page, officer_landing_page, edit_household, add_household, add_resident, resident_detail, edit_resident, logout_view, make_reservation, ReservationListView, update_reservation_status, cancel_reservation, cancel_request, ViewAppointment, update_appointment_status
-from .views import HouseholdListView, HouseholdDetailView, HouseholdDetailsView, EditHousehold, submit_request, update_request, edit_billing_status, EditResident, ViewResidentInfo, newsfeed, news_feed, add_news, edit_news, RequestListView, update_request_status, AppointmentListView, calendar
+from .views import HouseholdListView, ResidentListView, HouseholdDetailView, HouseholdDetailsView, EditHousehold, submit_request, update_request, edit_billing_status, EditResident, ViewResidentInfo, newsfeed, news_feed, add_news, edit_news, RequestListView, update_request_status, AppointmentListView, calendar
 from .views import subscribe_newsletter, events_calendar, eventscalendar, news_article, officer_profile_info, officer_update_profile, about, member_profile_info, member_update_profile, communitymap, MyReservation, MyRequest, ViewRequest, MyAppointment, make_appointment, cancel_appointment, update_appointment, update_reservation
 from .views import OfficerNotificationsView, MemberNotificationsView, create_payment_link, send_activation_email
 from django.conf import settings
@@ -79,6 +79,7 @@ urlpatterns = [
     path('officer/<username>/newsfeed/news-article/<int:pk>', views.news_single, name="news_single"),
     #officer household
     path('officer/<username>/household-list/', HouseholdListView.as_view(), name='household_list'),
+    path('officer/<username>/resident-list/', ResidentListView.as_view(), name='resident_list'),
     path('officer/<username>/household-list/<int:pk>/', HouseholdDetailView.as_view(), name='view_household'),
     path('officer/<username>/household-list/<int:pk>/edit/', EditHousehold.as_view(), name='modify_household'),
     path('officer/<username>/household-list/<int:pk>/residents/<int:resident_id>', ViewResidentInfo.as_view(), name='view_resident_info'),
