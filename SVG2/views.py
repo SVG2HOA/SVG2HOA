@@ -1341,13 +1341,15 @@ def member_update_profile(request, username):
     if request.method == 'POST':
         form = MemberChangeForm(request.POST, request.FILES, instance=user)
 
-        # Check for duplicate username
-        new_username = form.cleaned_data.get('username')
-        if new_username and User.objects.filter(username=new_username).exists():
-            messages.error(request, "The username you entered is already taken.")
-            return render(request, 'member/profile/profile_update.html', {'form': form})
-
         if form.is_valid():
+            # Get the new username from the form
+            new_username = form.cleaned_data.get('username')
+
+            # Check for duplicate username only if it has been changed
+            if new_username and new_username != username and User.objects.filter(username=new_username).exists():
+                messages.error(request, "The username you entered is already taken.")
+                return render(request, 'member/profile/profile_update.html', {'form': form})
+
             user = form.save(commit=False)
             
             # Update username_changed timestamp when username is changed
@@ -1357,6 +1359,7 @@ def member_update_profile(request, username):
             user.save()
 
             messages.success(request, "Profile updated successfully!", extra_tags="profile_updated")
+            
             # Send notifications to all officers
             officers = User.objects.filter(is_officer=True)
             for officer in officers:
@@ -1366,6 +1369,7 @@ def member_update_profile(request, username):
                     created_at=timezone.now()
                 )
                 notification.save()
+
             return redirect('member_profile_info', username=user.username)
     else:
         form = MemberChangeForm(instance=user)
@@ -2651,16 +2655,18 @@ def officer_update_profile(request, username):
     if request.method == 'POST':
         form = OfficerChangeForm(request.POST, request.FILES, instance=user)
 
-        # Check for duplicate username
-        new_username = form.cleaned_data.get('username')
-        if new_username and User.objects.filter(username=new_username).exists():
-            messages.error(request, "The username you entered is already taken.")
-            return render(request, 'officer/profile/profile_update.html', {
-                'form': form,
-                'roles_choices': available_roles_choices
-            })
-
         if form.is_valid():
+            # Get the new username from the form
+            new_username = form.cleaned_data.get('username')
+
+            # Check for duplicate username only if it has been changed
+            if new_username and new_username != username and User.objects.filter(username=new_username).exists():
+                messages.error(request, "The username you entered is already taken.")
+                return render(request, 'officer/profile/profile_update.html', {
+                    'form': form,
+                    'roles_choices': available_roles_choices
+                })
+
             user = form.save(commit=False)
             
             # Update username_changed timestamp when username is changed
