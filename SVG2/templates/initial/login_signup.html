@@ -151,7 +151,8 @@ form.sign-in-form {
 
 .input-field input::placeholder {
   color: rgb(26, 26, 26);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .input-field.user-type {
@@ -190,7 +191,8 @@ form.sign-in-form {
     border: none;
     background: transparent;
     outline: none;
-    font-size: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
     color: #333;
     border-radius: 10px;
 }
@@ -201,6 +203,7 @@ form.sign-in-form {
   color: rgb(26, 26, 26);
   transition: 0.5s;
   font-size: 1.1rem;
+  font-weight: 600;
   padding: 10px;
   border: none;
 }
@@ -619,7 +622,7 @@ form.sign-in-form {
                     id="togglePassword"
                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;"
                 >
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-eye-slash"></i>
                 </button>
             </div>
         
@@ -662,7 +665,7 @@ form.sign-in-form {
                     id="togglePassword1"
                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;"
                 >
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-eye-slash"></i>
                 </button>
             </div>
             
@@ -674,7 +677,7 @@ form.sign-in-form {
                     id="togglePassword2"
                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;"
                 >
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-eye-slash"></i>
                 </button>
             </div>
               
@@ -754,8 +757,8 @@ form.sign-in-form {
             const isPassword = password1Input.getAttribute("type") === "password";
             password1Input.setAttribute("type", isPassword ? "text" : "password");
             togglePassword1Button.innerHTML = isPassword
-              ? '<i class="fas fa-eye-slash"></i>'
-              : '<i class="fas fa-eye"></i>';
+              ? '<i class="fas fa-eye"></i>'
+              : '<i class="fas fa-eye-slash"></i>';
           });
         }
     
@@ -764,8 +767,8 @@ form.sign-in-form {
             const isPassword = password2Input.getAttribute("type") === "password";
             password2Input.setAttribute("type", isPassword ? "text" : "password");
             togglePassword2Button.innerHTML = isPassword
-              ? '<i class="fas fa-eye-slash"></i>'
-              : '<i class="fas fa-eye"></i>';
+            ? '<i class="fas fa-eye"></i>'
+            : '<i class="fas fa-eye-slash"></i>';
           });
         }
     
@@ -778,8 +781,8 @@ form.sign-in-form {
             const isPassword = loginPasswordInput.getAttribute("type") === "password";
             loginPasswordInput.setAttribute("type", isPassword ? "text" : "password");
             togglePasswordButton.innerHTML = isPassword
-              ? '<i class="fas fa-eye-slash"></i>'
-              : '<i class="fas fa-eye"></i>';
+            ? '<i class="fas fa-eye"></i>'
+            : '<i class="fas fa-eye-slash"></i>';
           });
         }
       });

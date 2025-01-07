@@ -115,18 +115,25 @@ Manage Users
                             </td>
                             <td class="py-4 px-6">
                                 <div class="gap-x-4 flex justify-center items-center">
-                                {% if user.is_active %}
-                                    <a href="{% url 'toggle_user_activation' user.username user.id %}" class="font-medium text-red-600 rounded-md p-2 bg-red-100 dark:bg-red-200 dark:text-red-800 hover:bg-red-300">Deactivate</a>  
-                                {% else %}
-                                    <a href="{% url 'toggle_user_activation' user.username user.id %}" class="font-medium text-green-600 rounded-md p-2 px-4 bg-green-100 dark:bg-green-200 dark:text-green-800 hover:bg-green-300">Activate</a>             
-                                {% endif %} 
-                                <button onclick="openDeleteUserModal('{{ user.id }}')" class="text-red-600 hover:text-red-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>  
-                            </div>                
+                                    {% if user.is_active %}
+                                        <button onclick="openActivationModal('{{ user.id }}', 'Deactivate')" 
+                                            class="font-medium text-red-600 rounded-md p-2 bg-red-100 dark:bg-red-200 dark:text-red-800 hover:bg-red-300">
+                                            Deactivate
+                                        </button>
+                                    {% else %}
+                                        <button onclick="openActivationModal('{{ user.id }}', 'Activate')" 
+                                            class="font-medium text-green-600 rounded-md p-2 px-4 bg-green-100 dark:bg-green-200 dark:text-green-800 hover:bg-green-300">
+                                            Activate
+                                        </button>
+                                    {% endif %}
+                                    <button onclick="openDeleteUserModal('{{ user.id }}')" class="text-red-600 hover:text-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                            <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>  
+                                </div>
                             </td>
+                            
                         </tr>
                         {% empty %}
                         <tr>
@@ -139,7 +146,26 @@ Manage Users
                 </table>
             </div>
         </div>
-
+        <div id="userActivationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 shadow-lg w-11/12 sm:w-1/3 max-w-md">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Change User Status</h3>
+                <p class="text-gray-600" id="activationMessage">Are you sure you want to change this user's status?</p>
+                <form action="{% url 'toggle_user_activation' user.username user.id %}" id="activationForm" method="post">
+                    {% csrf_token %}
+                    <div class="flex justify-center gap-6 mt-8">
+                        <button type="submit">
+                            <span class="font-medium text-green-600 rounded-md p-2 px-4 bg-green-200 dark:bg-green-200 dark:text-green-800 hover:bg-green-300">
+                                Confirm
+                            </span>
+                        </button>
+                        <button type="button" onclick="closeActivationModal()">
+                            <span class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Cancel</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
         <div id="userDeleteModal"
     class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 shadow-lg w-11/12 sm:w-1/3 max-w-md">
@@ -161,6 +187,19 @@ Manage Users
 </div>
 
     <script>
+          function openActivationModal(userId, action) {
+        const modal = document.getElementById('userActivationModal');
+        const form = document.getElementById('activationForm');
+        const message = document.getElementById('activationMessage');
+        form.action = `toggle_user_activation/${userId}/`; // Adjust URL dynamically
+        message.textContent = `Are you sure you want to ${action.toLowerCase()} this user?`;
+        modal.classList.remove('hidden');
+    }
+
+    function closeActivationModal() {
+        const modal = document.getElementById('userActivationModal');
+        modal.classList.add('hidden');
+    }
       function openDeleteUserModal(userId) {
           const modal = document.getElementById('userDeleteModal');
           const form = document.getElementById('deleteUserForm');

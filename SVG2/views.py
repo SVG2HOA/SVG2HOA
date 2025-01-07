@@ -2586,7 +2586,7 @@ def manage_users(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def toggle_user_activation(request, username, user_id):
-    user = User.objects.get(id=user_id)
+    user = get_object_or_404(User, id=user_id)
 
     # Check if the user making the request is an officer
     if request.user.is_officer:

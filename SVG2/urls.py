@@ -104,7 +104,7 @@ urlpatterns = [
     #officer user management
     path('officer/<username>/manage_users/', views.manage_users, name='manage_users'),
     path('officer/<username>/manage_users/delete/<int:pk>/', views.delete_user, name='delete_user'),
-    path('officer/<username>/toggle_user_activation/<int:user_id>/', views.toggle_user_activation, name='toggle_user_activation'),
+    path('officer/<username>/manage_users/toggle_user_activation/<int:user_id>/', views.toggle_user_activation, name='toggle_user_activation'),
     #officer events calendar
     path('officer/<username>/events_calendar/', views.events_calendar, name='events_calendar'),
     path('officer/<username>/events_calendar/<int:year>/<int:month>/', events_calendar, name='cal_w_date'),
