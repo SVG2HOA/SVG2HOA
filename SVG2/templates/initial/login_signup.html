@@ -570,6 +570,47 @@ form.sign-in-form {
     </style>
   </head>
   <body>
+
+<!-- Modal Structure -->
+<div id="termsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; overflow: hidden;">
+  <div style="position:relative; margin:5% auto; width:70%; background:rgb(228, 228, 228); padding:20px; border-radius:8px; text-align: center;">
+    <h2>Terms and Conditions</h2>
+    <p style="margin-top: 10px; margin-bottom: 10px;">  By signing up, you agree to our terms and conditions. Please read them carefully before proceeding. </p>
+    <div class="modal-body" style="padding: 5px; overflow-y: auto; max-height: calc(300px); background:rgb(255, 255, 255); text-align: left;">
+    <p style="font-size: 15px; color:#333;">1. Eligibility<br>You must be a registered member or officer of the HOA to access and use this system. Users must be at least 18 years old or have parental consent to use the services provided by the system.
+    <Br><br>
+      2. Account Registration<br>To use certain features of the system, you may need to create an account. You agree to provide accurate, complete, and up-to-date information during the registration process and to update such information as necessary. You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.
+      <Br><br>
+      3. User Responsibilities<br>You agree to use the system in compliance with all applicable laws and regulations. You must not:
+      <br>
+            - Use the system for any unlawful or fraudulent activities.<br>
+            - Post, upload, or transmit any content that is harmful, abusive, or offensive.<br>
+            - Impersonate any individual or entity, or falsely represent your affiliation with any person or organization.<br>
+            -Interfere with or disrupt the functionality of the system.<br>
+          <Br>
+          4. Reservations, Appointments, and Requests<br>
+            - By using the system to make reservations, appointments, or requests, you agree to comply with the terms and conditions set by the HOA, including:<br>
+            - Reservation requests are subject to availability and approval.<br>
+            - Appointments and requests may be subject to approval by relevant officers or administrators.<br>
+            - All cancellations and modifications must be made within the specified timeframes.<br>
+          <Br>
+    5. Billing and Payments<br>If applicable, you agree to make timely payments for any services or amenities you reserve through the system. The HOA may charge fees for certain services, and failure to pay any outstanding fees may result in the suspension or termination of your access to certain system features.
+    <Br><br>
+    6. Notifications<br>You consent to receiving notifications through the system related to updates, reminders, announcements, and other communications related to your membership and activities within the HOA. Notifications may be sent by the HOA or other users, such as officers or members.
+    <Br><br>
+    7. Privacy and Data Security<br>The HOA values your privacy and is committed to protecting your personal information. By using this system, you agree to the collection, use, and storage of your personal data. The HOA will take reasonable measures to secure your data but cannot guarantee absolute security.
+    <Br><br>
+    8. Content Ownership and Usage<br>All content uploaded to the system, including but not limited to text, images, and other media, remains the property of the respective user or the HOA. By submitting content, you grant the HOA a license to use, display, and distribute the content within the system and for related purposes.
+    <Br><br>
+    9. Changes to Terms<br>The HOA reserves the right to modify these Terms and Conditions at any time. Any changes will be posted on this page, and the updated terms will be effective immediately upon posting. Your continued use of the system after such changes constitutes your acceptance of the new terms.
+    <Br><br>
+    10. Termination<br>The HOA reserves the right to suspend or terminate your access to the system if you violate these Terms and Conditions or engage in activities that are detrimental to the system or other users. You may also terminate your account by contacting the HOA.
+    <Br><br>
+    11. Limitation of Liability - The HOA is not liable for any direct, indirect, incidental, special, or consequential damages arising from your use or inability to use the system, including but not limited to any errors, omissions, or disruptions in service.</p>
+  </div>
+    <button onclick="closeModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:18px; cursor:pointer;">&times;</button>
+  </div>
+</div>
     <div class="container " style="background-image: url('{% static "images/bg11.jpg" %}')">
         <div class="overlay"></div>
       <div class="forms-container ">
@@ -690,7 +731,7 @@ form.sign-in-form {
           <div class="form-footer">
             <label for="terms" style="color: white;">
               <input type="checkbox" id="terms" name="terms" required />
-              <span class="ml-2">I agree to the <a href="{% url 'about' %}#terms" id="terms-link" class="terms">Terms and Conditions</a></span>
+              <span class="ml-2">I agree to the <a href="#" class="terms" onclick="openModal()">Terms and Conditions</a></span>
             </label>
           </div>
 
@@ -786,6 +827,12 @@ form.sign-in-form {
           });
         }
       });
+  function openModal() {
+    document.getElementById('termsModal').style.display = 'block';
+  }
+  function closeModal() {
+    document.getElementById('termsModal').style.display = 'none';
+  }
     </script>
     
     <script src="{% static 'js/bundle.js' %}"></script>
