@@ -621,34 +621,40 @@ form.sign-in-form {
             <h2 class="title animate_top">SIGN IN</h2>
         
             {% if login_form.errors %}
-                <div class="error-messages">
-                    <ul>
-                        {% for error in login_form.errors.values %}
-                            <li>{{ error|join:" " }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        
-            {% if signup_form.errors %}
-                <div class="error-messages">
-                    <ul>
-                        {% for error in signup_form.errors.values %}
-                            <li>{{ error|join:" " }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        
-            {% if messages %}
-                <ul class="success-messages">
-                    {% for message in messages %}
-                        {% if "sign_up" in message.tags %}
-                            <li>{{ message }}</li>
-                        {% endif %}
+            <div class="error-messages">
+                <ul>
+                    {% for error in login_form.errors.values %}
+                        <li>{{ error|join:" " }}</li>
                     {% endfor %}
                 </ul>
+            </div>
+        {% endif %}
+        
+        {% if signup_form.errors %}
+            <div class="error-messages">
+                <ul>
+                    {% for error in signup_form.errors.values %}
+                        <li>{{ error|join:" " }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        {% if messages %}
+        {% for message in messages %}
+            {% if "sign_up" in message.tags %}
+                <ul class="success-messages">
+                    <li>{{ message }}</li>
+                </ul>
+            {% elif "unauthorized" in message.tags %}
+                <ul class="error-messages">
+                    <li>{{ message }}</li>
+                </ul>
             {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+        
         
             <div class="input-field relative">
                 <i class="fas fa-user"></i>

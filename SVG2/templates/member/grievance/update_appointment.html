@@ -41,20 +41,20 @@ Update Appointment
     </div>
 
     {% if messages %}
-    <ul class="messages text-center text-lg font-semibold mt-2">
-        {% for message in messages %}
-            {% if "error" in message.tags %}
-                <li class="text-red-500">
-                    {{ message.message }}
-                </li>
-            {% elif "appointment_updated" in message.tags %}
-                <li class="text-green-500">
-                    {{ message.message }}
-                </li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-{% endif %}
+      <ul class="messages text-center text-lg font-semibold mt-2">
+          {% for message in messages %}
+              {% if "error" in message.tags %}
+              <li {% if message.tags %} class="{{ message.tags }}"
+              {% endif %}>{{ message.message }}
+                  </li>
+              {% elif "appointment_updated" in message.tags %}
+                  <li  {% if message.tags %} class="{{ message.tags }}"
+                  {% endif %}>{{ message.message }}
+                  </li>
+              {% endif %}
+          {% endfor %}
+      </ul>
+  {% endif %}
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
         <div class="border-b border-gray-900/10 pb-12">
@@ -62,7 +62,7 @@ Update Appointment
             <div class="sm:col-span-2">
               <label for="appointment_type" class="block text-sm font-medium leading-6 text-gray-900">Appointment Type</label>
               <div class="mt-2">
-                <select id="appointment_type" name="appointment_type" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                <select id="appointment_type" name="appointment_type" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                   {% for value, display_text in form.fields.appointment_type.choices %}
                       <option value="{{ value }}" {% if form.instance.appointment_type == value %} selected {% endif %}>{{ display_text }}</option>
                   {% endfor %}
@@ -70,20 +70,20 @@ Update Appointment
               </div>
             </div>
             <div class="sm:col-span-2">
-              <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Subject:</label>
+              <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Subject</label>
               <div class="mt-2">
                 <input type="text" name="subject" id="subject" {% if grievance_appointment.id %} value="{{ form.subject.value }}" {% else %} value="" {% endif %}
-                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
               </div>
             </div>
 
             <div class="sm:col-span-2">
               <label for="reservation_date" class="block text-sm font-medium leading-6 text-gray-900">Reservation
-                Date:</label>
+                Date</label>
               <div class="mt-2">
                 <input type="date" name="reservation_date" id="reservation_date"
                   value="{{ form.reservation_date.value|date:'Y-m-d' }}"
-                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                   {% if form.reservation_date.errors %}
                   <p class="text-red-500 text-sm ml-2">{{ form.reservation_date.errors.0 }}</p>
                   {% endif %}
@@ -91,7 +91,7 @@ Update Appointment
             </div>
 
             <div class="col-span-full">
-              <label for="description" class="block text-sm font-medium leading-6 text-gray-900">Description</label>
+              <label for="description" class="block text-sm font-medium leading-6 text-gray-900">Brief Situation</label>
               <div class="mt-2">
                 <textarea id="description" name="description" rows="3"
                   class="block w-full p-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6">{% if grievance_appointment.id %}{{ form.description.value }}{% endif %} </textarea>
@@ -100,7 +100,7 @@ Update Appointment
             </div>
 
             <div class="col-span-full">
-              <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Insert Image:</label>
+              <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Insert Image (Optional)</label>
               <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                 <div class="text-center">
                   <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor"

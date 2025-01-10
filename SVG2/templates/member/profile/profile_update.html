@@ -1,6 +1,6 @@
 {% extends 'member/base.html' %}
 
-{% load static %}
+{% load static tailwind_tags %}
 
 {% block title %}
 Update User Profile
@@ -33,12 +33,12 @@ Update User Profile
       <ul class="messages text-center text-lg font-semibold mt-2">
           {% for message in messages %}
               {% if "error" in message.tags %}
-                  <li class="text-red-500">
-                      {{ message.message }}
+              <li {% if message.tags %} class="{{ message.tags }}"
+              {% endif %}>{{ message.message }}
                   </li>
               {% elif "update_prof" in message.tags %}
-                  <li class="text-green-500">
-                      {{ message.message }}
+                  <li  {% if message.tags %} class="{{ message.tags }}"
+                  {% endif %}>{{ message.message }}
                   </li>
               {% endif %}
           {% endfor %}
@@ -78,28 +78,35 @@ Update User Profile
                 <div class="md:col-span-2 xl:col-span-2">
                     <label for="fname" class="block text-sm font-medium leading-6 text-gray-900">First Name:</label>
                     <div class="mt-2">
-                      <input type="text" name="fname" id="fname" {% if user.id %} value="{{ form.fname.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <input type="text" name="fname" id="fname" {% if user.id %} value="{{ form.fname.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                     </div>
                 </div>
 
                 <div class="md:col-span-2 xl:col-span-2">
                     <label for="lname" class="block text-sm font-medium leading-6 text-gray-900">Last Name:</label>
                     <div class="mt-2">
-                      <input type="text" name="lname" id="lname" {% if user.id %} value="{{ form.lname.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <input type="text" name="lname" id="lname" {% if user.id %} value="{{ form.lname.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                     </div>
                 </div>
 
                 <div class="md:col-span-2 xl:col-span-2">
-                    <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Username:</label>
-                    <div class="mt-2">
-                      <input type="text" name="username" id="username" {% if user.id %} value="{{ form.username.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                    </div>
-                </div>
+                  <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Username:</label>
+                  <div class="mt-2">
+                      <input type="text" name="username" id="username" 
+                             value="{{ form.username.value|default:'' }}" 
+                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
+                  </div>
+                  {% if form.username.errors %}
+                  <p class="text-red-500 text-sm mt-1">
+                      {{ form.username.errors|join:", " }}
+                  </p>
+                  {% endif %}
+              </div>
 
                 <div class="md:col-span-2 xl:col-span-2">
                     <label for="email" class="block text-sm font-medium leading-6 text-gray-900">E-mail:</label>
                     <div class="mt-2">
-                      <input type="text" name="email" id="email" {% if user.id %} value="{{ form.email.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <input type="text" name="email" id="email" {% if user.id %} value="{{ form.email.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                     </div>
                 </div>
 
@@ -108,7 +115,7 @@ Update User Profile
                   <div class="mt-2">
                       <input type="text" name="phone_number" id="phone_number" 
                              value="{{ form.phone_number.value|default:'' }}" 
-                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                   </div>
               </div>
               
@@ -116,7 +123,7 @@ Update User Profile
                 <div class="md:col-span-2 xl:col-span-2">
                     <label for="birthdate" class="block text-sm font-medium leading-6 text-gray-900">Birth date:</label>
                     <div class="mt-2">
-                      <input type="date" name="birthdate" id="birthdate" value="{{ form.birthdate.value|date:'Y-m-d' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <input type="date" name="birthdate" id="birthdate" value="{{ form.birthdate.value|date:'Y-m-d' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                     </div>
                 </div>              
 

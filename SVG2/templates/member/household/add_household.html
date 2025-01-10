@@ -42,7 +42,7 @@ Add Household
                     <div class="sm:col-span-1">
                       <label for="block" class="block text-sm font-medium leading-6 text-gray-900">Block</label>
                       <div class="mt-2">
-                        <select id="block" name="block" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        <select id="block" name="block" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                             {% for value, display_text in block_choices %}
                                 <option value="{{ value }}">{{ display_text }}</option>
                             {% endfor %}
@@ -53,14 +53,14 @@ Add Household
                 <div class="sm:col-span-1">
                     <label for="lot" class="block text-sm font-medium leading-6 text-gray-900">Lot</label>
                     <div class="mt-2">
-                      <input type="text" name="lot" id="lot" {% if household.id %} value="{{ form.lot.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <input type="text" name="lot" id="lot" {% if household.id %} value="{{ form.lot.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                  </div>
                 </div>
 
                     <div class="sm:col-span-2">
                         <label for="street" class="block text-sm font-medium leading-6 text-gray-900">Street</label>
                         <div class="mt-2">
-                            <select id="street" name="street" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <select id="street" name="street" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                                 {% for value, display_text in street_choices %}
                                 <option value="{{ value }}">{{ display_text }}</option>
                             {% endfor %}
@@ -71,7 +71,7 @@ Add Household
                     <div class="sm:col-span-2">
                         <label for="home_tenure" class="block text-sm font-medium leading-6 text-gray-900">Home Tenure</label>
                         <div class="mt-2">
-                            <select id="home_tenure" name="home_tenure" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <select id="home_tenure" name="home_tenure" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                                 {% for value, display_text in home_tenure_choices %}
                                     <option value="{{ value }}">{{ display_text }}</option>
                                 {% endfor %}
@@ -82,7 +82,7 @@ Add Household
                     <div class="sm:col-span-2">
                       <label for="land_tenure" class="block text-sm font-medium leading-6 text-gray-900">Land Tenure</label>
                       <div class="mt-2">
-                        <select id="land_tenure" name="land_tenure" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        <select id="land_tenure" name="land_tenure" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                             {% for value, display_text in land_tenure_choices %}
                                 <option value="{{ value }}">{{ display_text }}</option>
                             {% endfor %}
@@ -93,7 +93,7 @@ Add Household
                     <div class="sm:col-span-2">
                         <label for="construction" class="block text-sm font-medium leading-6 text-gray-900">Construction</label>
                         <div class="mt-2">
-                            <select id="construction" name="construction" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <select id="construction" name="construction" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                                 {% for value, display_text in construction_choices %}
                                 <option value="{{ value }}">{{ display_text }}</option>
                             {% endfor %}
@@ -104,7 +104,7 @@ Add Household
                       <div class="sm:col-span-2">
                         <label for="kitchen" class="block text-sm font-medium leading-6 text-gray-900">Kitchen</label>
                         <div class="mt-2">
-                            <select id="kitchen" name="kitchen" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <select id="kitchen" name="kitchen" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                                 {% for value, display_text in kitchen_choices %}
                                 <option value="{{ value }}">{{ display_text }}</option>
                             {% endfor %}
@@ -117,7 +117,7 @@ Add Household
                       <div class="sm:col-span-2">
                         <label for="water_facility" class="block text-sm font-medium leading-6 text-gray-900">Water Facility</label>
                         <div class="mt-2">
-                            <select id="water_facility" name="water_facility" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <select id="water_facility" name="water_facility" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                                 {% for value, display_text in water_facility_choices %}
                                 <option value="{{ value }}">{{ display_text }}</option>
                             {% endfor %}
@@ -128,7 +128,7 @@ Add Household
                       <div class="sm:col-span-2">
                         <label for="toilet_facility" class="block text-sm font-medium leading-6 text-gray-900">Toilet Facility</label>
                         <div class="mt-2">
-                            <select id="toilet_facility" name="toilet_facility" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <select id="toilet_facility" name="toilet_facility" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                                 {% for value, display_text in toilet_facility_choices %}
                                 <option value="{{ value }}">{{ display_text }}</option>
                             {% endfor %}

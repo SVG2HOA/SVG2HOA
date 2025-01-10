@@ -336,6 +336,10 @@ def logout_view(request):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def member_landing_page(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+
     user = request.user
 
     # Initialize all counts to zero
@@ -410,6 +414,10 @@ def delete_note(request, username, note_id):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def newsfeed(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+
     latest_news = Newsfeed.objects.filter(created_at__lte=now()).order_by('-created_at').first()
     # Fetch all newsfeeds excluding the latest news
     if latest_news:
@@ -425,6 +433,10 @@ def newsfeed(request, username):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def newsarticle(request, username, pk):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+
     newsfeeds = Newsfeed.objects.all().order_by('-created_at')
     newsfeed = get_object_or_404(Newsfeed, pk=pk)
     return render(request, 'member/newsfeed/newsarticle.html', {'newsfeed': newsfeed, 'newsfeeds': newsfeeds})
@@ -435,6 +447,10 @@ class HouseholdDetailsView(RoleRequiredMixin, TemplateView):
     template_name = 'member/household/household_detail.html'
 
     def get(self, request, username):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+
         user = request.user
         try:
             household = Household.objects.get(owner_name=user)
@@ -455,6 +471,10 @@ class HouseholdDetailsView(RoleRequiredMixin, TemplateView):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def add_household(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+
     user = request.user
     
     # Check if the user's profile is updated
@@ -512,6 +532,10 @@ def add_household(request, username):
 class edit_household(RoleRequiredMixin, View):
     allowed_roles = ['is_member']
     def get(self, request, username):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+
         household = get_object_or_404(Household, owner_name=request.user)
         form = HouseholdForm(instance=household)
         return render(request, 'member/household/edit_household.html', {'form': form, 'household': household})
@@ -545,12 +569,18 @@ class edit_household(RoleRequiredMixin, View):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def resident_detail(request, username, pk):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     resident = get_object_or_404(Resident, pk=pk)
     return render(request, 'member/household/resident_detail.html', {'resident': resident})
 
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def add_resident(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     household = get_object_or_404(Household, owner_name=request.user)
     
     if request.method == "POST":
@@ -594,6 +624,9 @@ def add_resident(request, username):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def edit_resident(request, username, pk):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     resident = get_object_or_404(Resident, pk=pk)
     
     if request.method == "POST":
@@ -739,6 +772,11 @@ class MyReservation(RoleRequiredMixin, ListView):
     context_object_name = 'reservations'
 
     def get_queryset(self):
+        # Ensure the logged-in user matches the username in the URL
+        if self.request.user.username != self.kwargs.get('username'):
+            messages.error(self.request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+
         # Attempt to get the household of the currently logged-in user
         try:
             self.household = Household.objects.get(owner_name=self.request.user)
@@ -781,9 +819,9 @@ class MyReservation(RoleRequiredMixin, ListView):
         # Check if the user has a household
         context['no_household'] = self.household is None
 
-         # Add pagination
+        # Add pagination
         reservations = self.get_queryset()  # Get filtered and sorted reservations
-        paginator = Paginator(reservations, 5)  # Show 6 reservations per page
+        paginator = Paginator(reservations, 6)  # Show 6 reservations per page
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         context['reservations'] = page_obj
@@ -793,6 +831,9 @@ class MyReservation(RoleRequiredMixin, ListView):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def make_reservation(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     try:
         # Ensure we're getting the correct Household instance
@@ -868,6 +909,9 @@ def make_reservation(request, username):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def update_reservation(request, username, request_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     reservation = get_object_or_404(Reservation, id=request_id)
     user = request.user
     household = reservation.household  # Get the household associated with the reservation
@@ -962,8 +1006,13 @@ class MyRequest(RoleRequiredMixin, ListView):
     model = ServiceRequest
     template_name = 'member/services/my_requests.html'
     context_object_name = 'service_requests'
-    
+
     def get_queryset(self):
+        # Ensure the logged-in user matches the username in the URL
+        if self.request.user.username != self.kwargs.get('username'):
+            messages.error(self.request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+
         # Attempt to get the household of the currently logged-in user
         try:
             self.household = Household.objects.get(owner_name=self.request.user)
@@ -1004,9 +1053,9 @@ class MyRequest(RoleRequiredMixin, ListView):
 
         context['no_household'] = self.household is None
 
-         # Add pagination
+        # Add pagination
         service_requests = self.get_queryset()  # Get filtered and sorted reservations
-        paginator = Paginator(service_requests, 5)  # Show 6 reservations per page
+        paginator = Paginator(service_requests, 6)  # Show 6 service requests per page
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         context['service_requests'] = page_obj
@@ -1016,6 +1065,9 @@ class MyRequest(RoleRequiredMixin, ListView):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def submit_request(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     try:
         # Ensure we're getting the correct Household instance
@@ -1031,13 +1083,13 @@ def submit_request(request, username):
     if request.method == 'POST':
         form = ServiceRequestForm(request.POST, request.FILES)
         if form.is_valid():
-            service_request = form.save(commit=False)
-            # Check for duplicate service requests (same service type and title)
+            title = form.cleaned_data.get('title')
+            servicetype = form.cleaned_data.get('service_type')
+            
             existing_request = ServiceRequest.objects.filter(
                 household=household,
-                service_type=service_request.service_type,
-                title=service_request.title,
-                description=service_request.description
+                service_type=servicetype,  # Ensure the variable matches
+                title=title,
             ).exists()
 
             if existing_request:
@@ -1045,6 +1097,7 @@ def submit_request(request, username):
                 return redirect('submit_request', username=username)
 
             # Assign the household instance, not the user
+            service_request = form.save(commit=False)
             service_request.household = household
             service_request.save()
 
@@ -1060,6 +1113,9 @@ def submit_request(request, username):
                 notification.save()
 
             return redirect('submit_request', username=username)
+        else:
+            messages.error(request, f"Form submission failed: {form.errors}")
+            return redirect('submit_request', username=username)
     else:
         form = ServiceRequestForm()
 
@@ -1074,6 +1130,9 @@ def submit_request(request, username):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def update_request(request, username, request_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     service_request = get_object_or_404(ServiceRequest, id=request_id)
     household = service_request.household  # Get the household instance
     if request.method == 'POST':
@@ -1147,6 +1206,9 @@ class MyAppointment(RoleRequiredMixin, ListView):
     context_object_name = 'grievance_appointments'
     
     def get_queryset(self):
+        if self.request.user.username != self.kwargs.get('username'):
+            messages.error(self.request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         # Attempt to get the household of the currently logged-in user
         try:
             self.household = Household.objects.get(owner_name=self.request.user)
@@ -1200,6 +1262,9 @@ class MyAppointment(RoleRequiredMixin, ListView):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def make_appointment(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     try:
         household = Household.objects.get(owner_name=user)
@@ -1257,6 +1322,9 @@ def make_appointment(request, username):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def update_appointment(request, username, request_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     grievance_appointment = get_object_or_404(GrievanceAppointment, id=request_id)
     user = request.user
     household = grievance_appointment.household  # Get the household associated with the appointment
@@ -1328,6 +1396,9 @@ def cancel_appointment(request, username, request_id):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def member_profile_info(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     return render(request, 'member/profile/profile_info.html', {
         'user': user
@@ -1336,26 +1407,18 @@ def member_profile_info(request, username):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def member_update_profile(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = User.objects.get(username=username)
 
     if request.method == 'POST':
         form = MemberChangeForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
-            # Get the new username from the form
-            new_username = form.cleaned_data.get('username')
-
-            # Check for duplicate username only if it has been changed
-            if new_username and new_username != username and User.objects.filter(username=new_username).exists():
-                messages.error(request, "The username you entered is already taken.")
-                return render(request, 'member/profile/profile_update.html', {'form': form})
 
             user = form.save(commit=False)
-            
-            # Update username_changed timestamp when username is changed
-            if user.username != username:
-                user.username_changed = timezone.now()
-            
+
             user.save()
 
             messages.success(request, "Profile updated successfully!", extra_tags="profile_updated")
@@ -1419,6 +1482,9 @@ class MemberNotificationsView(RoleRequiredMixin, View):
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def eventscalendar(request, username, year=None, month=None): 
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     today = date.today()
 
     # Check if a month is selected from the input form
@@ -1464,6 +1530,9 @@ def eventscalendar(request, username, year=None, month=None):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def officer_landing_page(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     
     # Check if the user's profile is updated
@@ -1547,6 +1616,9 @@ def officer_landing_page(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def news_feed(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     
     # Check if the user's profile is updated
@@ -1581,6 +1653,9 @@ def news_feed(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def news_single(request, username, pk):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     newsfeeds = Newsfeed.objects.all().order_by('-created_at')
     newsfeed = get_object_or_404(Newsfeed, pk=pk)
     return render(request, 'officer/newsfeed/news_article.html', {'newsfeeds': newsfeeds, 'newsfeed': newsfeed})
@@ -1588,6 +1663,9 @@ def news_single(request, username, pk):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def add_news(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     if request.method == "POST":
         form = NewsfeedForm(request.POST, request.FILES)  # Add request.FILES to handle image files
         if form.is_valid():
@@ -1638,6 +1716,9 @@ def delete_news(request, username, pk):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def edit_news(request, username, pk):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     newsfeed = get_object_or_404(Newsfeed, pk=pk)
     if request.method == "POST":
         form = NewsfeedForm(request.POST, request.FILES, instance=newsfeed)  # Ensure to include request.FILES for image handling
@@ -1679,6 +1760,9 @@ def edit_news(request, username, pk):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def create_announcement(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     if request.method == 'POST':
         form = AnnouncementForm(request.POST, request.FILES)
         if form.is_valid():
@@ -1718,6 +1802,9 @@ def create_announcement(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def update_announcement(request, username, pk):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     announcement = Announcement.objects.get(pk=pk)
     if request.method == 'POST':
         form = AnnouncementForm(request.POST, request.FILES, instance=announcement)
@@ -1775,6 +1862,10 @@ class HouseholdListView(RoleRequiredMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         # Check if the user's profile is updated
+        if self.request.user.username != self.kwargs.get('username'):
+            messages.error(self.request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+            
         if not request.user.fname or not request.user.lname:
             messages.warning(
                 request, 
@@ -1893,6 +1984,10 @@ class ResidentListView(RoleRequiredMixin, ListView):
     context_object_name = 'residents'
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.username != kwargs.get('username'):
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+
         # Check if the user's profile is updated
         if not request.user.fname or not request.user.lname:
             messages.warning(
@@ -1971,6 +2066,9 @@ class ResidentListView(RoleRequiredMixin, ListView):
 class HouseholdDetailView(RoleRequiredMixin, View):
     allowed_roles = ['is_officer']
     def get(self, request, username, pk):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         user = request.user
         household = get_object_or_404(Household, pk=pk)
 
@@ -2000,6 +2098,9 @@ class HouseholdDetailView(RoleRequiredMixin, View):
 class EditHousehold(RoleRequiredMixin, View):
     allowed_roles = ['is_officer']
     def get(self, request, username, pk):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         household = get_object_or_404(Household, pk=pk)
         form = HouseholdForm(instance=household)
         return render(request, 'officer/household/edithousehold.html', {'form': form, 'household': household})
@@ -2044,6 +2145,9 @@ class EditHousehold(RoleRequiredMixin, View):
 class ViewResidentInfo(RoleRequiredMixin, View):
     allowed_roles = ['is_officer']
     def get(self, request, username, pk, resident_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         household = get_object_or_404(Household, pk=pk)
         resident = get_object_or_404(Resident, id=resident_id)
         return render(request, 'officer/household/view_resident_info.html', {'resident': resident, 'household': household})
@@ -2051,6 +2155,9 @@ class ViewResidentInfo(RoleRequiredMixin, View):
 class EditResident(RoleRequiredMixin, View):
     allowed_roles = ['is_officer']
     def get(self, request, username, pk, resident_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         household = get_object_or_404(Household, pk=pk)
         resident = get_object_or_404(Resident, id=resident_id)
         form = ResidentForm(instance=resident)
@@ -2159,6 +2266,9 @@ def dlt_resident(request, username, pk, resident_id):
 class edit_billing_status(RoleRequiredMixin, View):
     allowed_roles = ['is_officer']
     def get(self, request, username, pk, billing_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         household = get_object_or_404(Household, pk=pk)
         billing = get_object_or_404(Billing, id=billing_id)
         form = BillingStatusForm(instance=billing)
@@ -2209,6 +2319,9 @@ class ReservationListView(RoleRequiredMixin, ListView):
     context_object_name = 'reservations'
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.username != kwargs.get('username'):
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         # Check if the user's profile is updated
         if not request.user.fname or not request.user.lname:
             messages.warning(
@@ -2264,6 +2377,9 @@ class ReservationListView(RoleRequiredMixin, ListView):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def update_reservation_status(request, username, reservation_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     # Fetch the reservation instance or return a 404 error if not found
     reservation = get_object_or_404(Reservation, id=reservation_id)
 
@@ -2314,6 +2430,9 @@ class RequestListView(RoleRequiredMixin, ListView):
     context_object_name = 'servicerequests'
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.username != kwargs.get('username'):
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         # Check if the user's profile is updated
         if not request.user.fname or not request.user.lname:
             messages.warning(
@@ -2369,12 +2488,18 @@ class RequestListView(RoleRequiredMixin, ListView):
 class ViewRequest(RoleRequiredMixin, View):
     allowed_roles = ['is_officer']
     def get(self, request, username, request_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         servicerequest = get_object_or_404(ServiceRequest, id=request_id)
         return render(request, 'officer/services/view_request.html', {'servicerequest': servicerequest})
 
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def update_request_status(request, username, servicerequest_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     # Fetch the service request instance or return a 404 error if not found
     servicerequest = get_object_or_404(ServiceRequest, id=servicerequest_id)
 
@@ -2425,6 +2550,9 @@ class AppointmentListView(RoleRequiredMixin, ListView):
     context_object_name = 'grievance_appointments'
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.username != kwargs.get('username'):
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         # Check if the user's profile is updated
         if not request.user.fname or not request.user.lname:
             messages.warning(
@@ -2480,12 +2608,18 @@ class AppointmentListView(RoleRequiredMixin, ListView):
 class ViewAppointment(RoleRequiredMixin, View):
     allowed_roles = ['is_officer']
     def get(self, request, username, request_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
         grievanceappointment = get_object_or_404(GrievanceAppointment, id=request_id)
         return render(request, 'officer/grievance/view_appointment.html', {'grievanceappointment': grievanceappointment})
 
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def update_appointment_status(request, username, grievanceappointment_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     # Fetch the grievance appointment instance or return a 404 error if not found
     grievance_appointment = get_object_or_404(GrievanceAppointment, id=grievanceappointment_id)
 
@@ -2532,6 +2666,9 @@ def update_appointment_status(request, username, grievanceappointment_id):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def manage_users(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     # Check if the user's profile is updated
     if not user.fname or not user.lname:
@@ -2640,6 +2777,9 @@ def delete_user(request, username, pk):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def officer_profile_info(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     return render(request, 'officer/profile/profile_info.html', {
         'user': user
@@ -2648,6 +2788,9 @@ def officer_profile_info(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def officer_update_profile(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = User.objects.get(username=username)
     assigned_roles = Officer.objects.exclude(user=user).values_list('officer_position', flat=True)
     available_roles_choices = [choice for choice in Officer.ROLES_CHOICES if choice[0] not in assigned_roles]
@@ -2700,7 +2843,10 @@ def officer_delete_profile(request, pk):
 #officer_views_calendar
 @login_required
 @user_passes_test(is_officer, login_url='/login')
-def events_calendar(request, username, year=None, month=None): 
+def events_calendar(request, username, year=None, month=None):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
     user = request.user
     
     # Check if the user's profile is updated

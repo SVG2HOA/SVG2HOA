@@ -67,7 +67,7 @@ Update Resident
               <div class="sm:md:col-span-2 lg:col-span-2 xl:col-span-2">
                 <label for="first_name" class="block text-sm font-medium leading-6 text-gray-900">First Name</label>
                 <div class="mt-2">
-                  <input type="text" name="first_name" id="first_name" {% if resident.id %} value="{{ form.first_name.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input type="text" name="first_name" id="first_name" {% if resident.id %} value="{{ form.first_name.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                 </div>
             </div>
 
@@ -81,7 +81,7 @@ Update Resident
               <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
                 <label for="last_name" class="block text-sm font-medium leading-6 text-gray-900">Last Name</label>
                 <div class="mt-2">
-                  <input type="text" name="last_name" id="last_name" {% if resident.id %} value="{{ form.last_name.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input type="text" name="last_name" id="last_name" {% if resident.id %} value="{{ form.last_name.value }}" {% else %} value="" {% endif %} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                 </div>
               </div>
     
@@ -142,7 +142,7 @@ Update Resident
               <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
                   <label for="birthdate" class="block text-sm font-medium leading-6 text-gray-900">Birth Date</label>
                   <div class="mt-2">
-                      <input type="date" name="birthdate" id="birthdate" value="{{ form.birthdate.value|date:'Y-m-d' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <input type="date" name="birthdate" id="birthdate" value="{{ form.birthdate.value|date:'Y-m-d' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                   </div>
                 </div>
               
@@ -156,7 +156,7 @@ Update Resident
               <div class="md:col-span-2 lg:col-span-1 xl:col-span-1">
                 <label for="gender" class="block text-sm font-medium leading-6 text-gray-900">Gender</label>
                 <div class="mt-2">
-                    <select id="gender" name="gender" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                    <select id="gender" name="gender" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                       {% for value, display_text in gender_choices %}
                           <option value="{{ value }}" {% if resident.gender == value %} selected {% endif %}>{{ display_text }}</option>
                       {% endfor %}
@@ -167,7 +167,7 @@ Update Resident
                 <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
                   <label for="civil_status" class="block text-sm font-medium leading-6 text-gray-900">Civil Status</label>
                   <div class="mt-2">
-                      <select id="civil_status" name="civil_status" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <select id="civil_status" name="civil_status" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                           {% for value, display_text in civil_status_choices %}
                           <option value="{{ value }}" {% if resident.civil_status == value %} selected {% endif %}>{{ display_text }}</option>
                       {% endfor %}
@@ -186,7 +186,7 @@ Update Resident
                <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
                   <label for="religion" class="block text-sm font-medium leading-6 text-gray-900">Religion</label>
                   <div class="mt-2">
-                      <select id="religion" name="religion" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      <select id="religion" name="religion" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                           {% for value, display_text in religion_choices %}
                           <option value="{{ value }}" {% if resident.religion == value %} selected {% endif %}>{{ display_text }}</option>
                       {% endfor %}
@@ -197,7 +197,7 @@ Update Resident
               <div class="md:col-span-2 lg:col-span-2 xl:col-span-2">
                 <label for="educational_attainment" class="block text-sm font-medium leading-6 text-gray-900">Educational Attainment</label>
                 <div class="mt-2">
-                    <select id="educational_attainment" name="educational_attainment" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                    <select id="educational_attainment" name="educational_attainment" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                         {% for value, display_text in educational_attainment_choices %}
                         <option value="{{ value }}" {% if resident.educational_attainment == value %} selected {% endif %}>{{ display_text }}</option>
                     {% endfor %}

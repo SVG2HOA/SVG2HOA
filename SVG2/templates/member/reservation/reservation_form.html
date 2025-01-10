@@ -40,12 +40,12 @@ New Reservation
         <ul class="messages text-center text-lg font-semibold mt-2">
             {% for message in messages %}
                 {% if "error" in message.tags %}
-                    <li class="text-red-500">
-                        {{ message.message }}
+                <li {% if message.tags %} class="{{ message.tags }}"
+                {% endif %}>{{ message.message }}
                     </li>
                 {% elif "reservation_created" in message.tags %}
-                    <li class="text-green-500">
-                        {{ message.message }}
+                    <li  {% if message.tags %} class="{{ message.tags }}"
+                    {% endif %}>{{ message.message }}
                     </li>
                 {% endif %}
             {% endfor %}
@@ -64,7 +64,7 @@ New Reservation
                   <div class="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1">
                     <label for="amenities" class="block text-sm font-medium leading-6 text-gray-900">Amenities</label>
                     <div class="mt-2">
-                        <select id="amenities" name="amenities" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" onchange="updateImage()">
+                        <select id="amenities" name="amenities" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" onchange="updateImage()" required>
                             {% for value, display_text in form.fields.amenities.choices %}
                                 <option value="{{ value }}" {% if form.instance.amenities == value or value == "Court" %} selected {% endif %}>
                                     {{ display_text }}
@@ -98,23 +98,23 @@ New Reservation
 </script>
                     
                     <div class="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1">
-                        <label for="reservation_date" class="block text-sm font-medium leading-6 text-gray-900">Reservation Date:</label>
+                        <label for="reservation_date" class="block text-sm font-medium leading-6 text-gray-900">Reservation Date</label>
                         <div class="mt-2">
-                          <input type="date" name="reservation_date" id="reservation_date" value="{{ form.date.value|date:'Y-m-d' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                          <input type="date" name="reservation_date" id="reservation_date" value="{{ form.date.value|date:'Y-m-d' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                         </div>
                       </div>
 
                       <div class="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1">
-                        <label for="reservation_time_start" class="block text-sm font-medium leading-6 text-gray-900">Start Time:</label>
+                        <label for="reservation_time_start" class="block text-sm font-medium leading-6 text-gray-900">Reservation Time Start</label>
                         <div class="mt-2">
-                          <input type="time" name="reservation_time_start" id="reservation_time_start" value="{{ announcement.time|time:'H:i:s' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                          <input type="time" name="reservation_time_start" id="reservation_time_start" value="{{ announcement.time|time:'H:i:s' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                         </div>
                       </div>
 
                       <div class="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1">
-                        <label for="reservation_time_end" class="block text-sm font-medium leading-6 text-gray-900">End:</label>
+                        <label for="reservation_time_end" class="block text-sm font-medium leading-6 text-gray-900">Reservation Time End</label>
                         <div class="mt-2">
-                          <input type="time" name="reservation_time_end" id="reservation_time_end" value="{{ announcement.time|time:'H:i:s' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                          <input type="time" name="reservation_time_end" id="reservation_time_end" value="{{ announcement.time|time:'H:i:s' }}" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
                         </div>
                       </div>
 

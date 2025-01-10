@@ -132,6 +132,16 @@ class MemberChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['fname', 'lname', 'username', 'email', 'profile_picture', 'phone_number', 'birthdate']
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        user_id = self.instance.id  # Get the ID of the user being updated
+
+        # Check if the username is already taken by another user
+        if User.objects.filter(username=username).exclude(id=user_id).exists():
+            raise ValidationError("The username you entered is already taken.")
+
+        return username
 
 class OfficerChangeForm(forms.ModelForm):
     officer_position = forms.ChoiceField(choices=Officer.ROLES_CHOICES, required=True)
@@ -153,6 +163,16 @@ class OfficerChangeForm(forms.ModelForm):
         officer_position = self.cleaned_data.get('officer_position')
         Officer.objects.update_or_create(user=user, defaults={'officer_position': officer_position})
         return user
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        user_id = self.instance.id  # Get the ID of the user being updated
+
+        # Check if the username is already taken by another user
+        if User.objects.filter(username=username).exclude(id=user_id).exists():
+            raise ValidationError("The username you entered is already taken.")
+
+        return username
 
 class RememberMeAuthenticationForm(AuthenticationForm):
     remember_me = forms.BooleanField(required=False, label='Remember_Me', initial=True)
