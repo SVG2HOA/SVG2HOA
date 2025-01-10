@@ -357,3 +357,21 @@ class Notification(models.Model):
         
     def __str__(self):
         return f"Notification for {self.recipient} - {self.content}"
+
+class FinancialFile(models.Model):
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to='financial_files/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def file_size(self):
+        if self.file:
+            size = self.file.size
+            for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+                if size < 1024:
+                    return f"{size:.2f} {unit}"
+                size /= 1024
+        return "0 bytes"
+
+    def __str__(self):
+        return self.title

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Notification
+from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Notification, FinancialFile
 
 class UserAdmin(UserAdmin):
     model = User
@@ -86,6 +86,10 @@ class NewsfeedAdmin(admin.ModelAdmin):
     ordering = ['pk', 'written_by', 'created_at']
     def pos(self, obj):
         return obj.written_by.officer_profile.officer_position
+
+@admin.register(FinancialFile)
+class FinancialFileAdmin(admin.ModelAdmin):
+    list_display = ('title', 'uploaded_at', 'uploaded_by', 'file_size')
 
 admin.site.register(User, UserAdmin)
 admin.site.register(NewsletterSubscriber)

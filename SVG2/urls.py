@@ -65,6 +65,9 @@ urlpatterns = [
     path('<int:pk>/profile/delete/', views.member_delete_profile, name='member_delete_profile'),
     #member notificatons
     path('<username>/dashboard/', MemberNotificationsView.as_view(), name='MemberNotificationsView'),
+    #member financial report
+    path('<username>/financial-statements/', views.financial_status, name='financial_status'),
+    path('<username>/financial-statements/download/<int:file_id>/', views.download_file, name='download_file'),
 
 #views for officers
     path('officer/<username>/dashboard/',  views.officer_landing_page, name='officer_landing_page'),
@@ -112,8 +115,11 @@ urlpatterns = [
     path('officer/<username>/dashboard/', OfficerNotificationsView.as_view(), name='OfficerNotificationsView'),
     path('mark_as_read/<int:notification_id>/', views.mark_as_read, name='mark_as_read'),
     path('mark_all_as_read/', views.mark_all_as_read, name='mark_all_as_read'),
+    #officer financial report
+    path('officer/<username>/financial-statements/', views.upload_financial_file, name='upload_financial_file'),
+    path('officer/<username>/financial-statements/download/<int:file_id>/', views.dl_file, name='dl_file'),
+    path('officer/<username>/financial-statements/delete/<int:file_id>/', views.delete_file, name='delete_file'),
 
     path("<username>/household/billing/<int:billing_id>/", create_payment_link, name="create_payment_link"),
-
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

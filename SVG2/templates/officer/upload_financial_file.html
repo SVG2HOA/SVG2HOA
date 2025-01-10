@@ -1,0 +1,266 @@
+{% extends 'officer/officer_base.html' %}
+{% load static tailwind_tags %}
+
+{% block title %}
+Financial Reports
+{% endblock title %}
+
+{% block content %}
+<div class="pt-16 lg:ml-64">
+    <div class="p-4 dark:border-gray-700">
+        {% if messages %}
+        <ul class="messages text-center text-lg font-semibold mt-2">
+            {% for message in messages %}
+                {% if "error" in message.tags %}
+                <li {% if message.tags %} class="{{ message.tags }}"
+                {% endif %}>{{ message.message }}
+                    </li>
+                {% elif "file_upload" in message.tags %}
+                    <li  {% if message.tags %} class="{{ message.tags }}"
+                    {% endif %}>{{ message.message }}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="w-full flex flex-wrap items-center justify-between sm:inline-block mt-2">
+        <div class="w-full sm:w-auto text-center sm:text-left">
+            <h3 class="text-3xl font-semibold leading-7 text-gray-900 mr-5">
+                Financial Reports
+              </h3>
+        </div>
+    </div>
+
+        <div id="fileModal"
+                            class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-6 shadow-lg w-11/12 sm:w-1/3 max-w-md">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">New Financial Report</h3>
+                                <form method="post" enctype="multipart/form-data" action="{% url 'upload_financial_file' username=request.user.username %}" class="space-y-4">
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                    <div class="flex justify-center gap-6 mt-8">
+                                        <button type="submit">
+                                            <span
+                                                class="font-medium text-green-600 rounded-md p-2 px-6 bg-green-200 dark:bg-green-200 dark:text-green-800 hover:bg-green-300">Upload</span>
+                                        </button>
+                                        <button type="button" onclick="closeAddFileModal()">
+                                            <span class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Cancel</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="w-full flex flex-wrap items-center justify-between sm:flex-start mt-4 mb-2 gap-4">
+                            <div class="w-full sm:w-auto sm:mt-0 flex flex-wrap items-center gap-4 justify-center sm:justify-start">
+                                <form method="GET" action="" class="w-full sm:w-auto">
+                            <div class="relative">
+                                <input type="text" name="search" value="{{ search_query }}"
+                                    class="block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    placeholder="Search">
+                                <button type="submit" class="absolute right-0 top-0 mt-2 mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        class="size-6">
+                                        <path fill-rule="evenodd"
+                                            d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+                        <button onclick="openAddFileModal()" class="bg-blue-500 text-md text-white font-bold px-3 py-1 rounded hover:bg-blue-700">
+                            + Report
+                        </button>
+                        </div>
+                        <form method="GET" action="" class="w-full sm:w-auto">
+                            <div class="flex items-center justify-between">
+                                <label for="sort" class="mr-2">Sort by:</label>
+                                <select name="sort" id="sort"
+                                            class="px-4 py-1 pr-9 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            onchange="this.form.submit()">
+                                            <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title</option>
+                                        <option value="uploaded_at" {% if sort_by == 'uploaded_at' %}selected{% endif %}>Uploaded At</option>
+                                    <!-- Removed billing status from backend sorting -->
+                                </select>
+                                <button type="submit" name="direction"
+                                    value="{% if direction == 'asc' %}desc{% else %}asc{% endif %}"
+                                    class="ml-2 px-4 py-2 text-gray-500 hover:text-gray-700">
+                                    {% if direction == 'asc' %}
+                                    Ascending ↑
+                                    {% else %}
+                                    Descending ↓
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+        <!-- Table -->
+        <div class="relative shadow-md sm:rounded-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+                    <thead
+                        class="text-md text-white uppercase bg-green-700 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 sticky top-0 z-10 w-1/8">
+                                Title
+                            </th>
+                            <th scope="col" class="px-6 py-3 sticky top-0 z-10 w-1/8">
+                                Uploaded at
+                            </th>
+                            <th scope="col" class="px-6 py-3 sticky top-0 z-10 w-1/8">
+                                File Size
+                            </th>
+                            <th scope="col-span-2" class="px-6 py-3 sticky top-0 z-10 w-1/8">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800">
+                        {% for file in files %}
+                        <tr class="bg-white text-gray-700 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ file.title }}
+                            </th>
+                            <td class="px-6 py-4">
+                                {{ file.uploaded_at }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ file.file_size }}
+                            </td>
+                            <td class="px-6 py-4">
+                                
+                                <div class="gap-x-4 flex justify-center items-center">
+                                <a href="{% url 'dl_file' user.username file.id %}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 hover:text-green-500">
+                                        <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                                      </svg>
+                                </a>
+                                <button onclick="openDeleteFileModal('{{ file.id }}')" class="text-red-600 hover:text-red-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>  
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                                No files found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div id="fileDeleteModal"
+    class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 shadow-lg w-11/12 sm:w-1/3 max-w-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Delete File</h3>
+        <p class="text-gray-600">Are you sure you want to delete this file?</p>
+        <form method="POST" id="deleteFileForm" action="">
+            {% csrf_token %}
+            <div class="flex justify-center gap-6 mt-8">
+                <button type="submit">
+                    <span
+                        class="font-medium text-red-600 rounded-md p-2 px-4 bg-red-200 dark:bg-red-200 dark:text-red-800 hover:bg-red-300">Delete</span>
+                </button>
+                <button type="button" onclick="closeDeletefileModal()">
+                    <span class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Cancel</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+            </div>
+        </div>
+
+        
+     
+{% if files %}
+<div class="mt-6 flex justify-center space-x-4">
+  {% if files.has_previous %}
+    <a href="?page={{ files.previous_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+      Previous
+    </a>
+  {% endif %}
+
+  {% if files.number > 1 %}
+    <a href="?page=1" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+      1
+    </a>
+    {% if files.number > 3 %}
+      <span class="px-4 py-2 text-gray-900">...</span>
+    {% endif %}
+  {% endif %}
+
+  {% if files.number > 2 %}
+    <a href="?page={{ files.number|add:-1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+      {{ files.number|add:-1 }}
+    </a>
+  {% endif %}
+
+  <span class="px-4 py-2 bg-blue-500 text-white rounded">{{ files.number }}</span>
+
+  {% if files.number < files.paginator.num_pages %}
+    {% if files.number < files.paginator.num_pages|add:-1 %}
+      <a href="?page={{ files.number|add:1 }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+        {{ files.number|add:1 }}
+      </a>
+    {% endif %}
+  {% endif %}
+
+  {% if files.number < files.paginator.num_pages %}
+    {% if files.number < files.paginator.num_pages|add:-2 %}
+      <span class="px-4 py-2 text-gray-900">...</span>
+    {% endif %}
+    {% if files.number != files.paginator.num_pages %}
+      <a href="?page={{ files.paginator.num_pages }}" class="px-4 py-2 text-gray-900 rounded hover:bg-gray-300">
+        {{ files.paginator.num_pages }}
+      </a>
+    {% endif %}
+  {% endif %}
+
+  {% if files.has_next %}
+    <a href="?page={{ files.next_page_number }}" class="px-4 py-2 text-gray-900 rounded hover:text-blue-600">
+      Next
+    </a>
+  {% endif %}
+</div>
+{% endif %}
+
+    </div>
+</div>
+
+<!-- Modal JavaScript -->
+<script>
+    const fileModal = document.getElementById('fileModal');
+    const fileDeleteModal = document.getElementById('fileDeleteModal');
+    const deleteFileForm = document.getElementById('deleteFileForm');
+
+    function openAddFileModal() {
+        fileModal.classList.remove('hidden');
+    }
+
+    function closeAddFileModal() {
+        fileModal.classList.add('hidden');
+    }
+
+    function openDeleteFileModal(fileId) {
+        const username = '{{ request.user.username }}';  // Use template context to get username
+        deleteFileForm.action = `delete/${fileId}/`;  // Set the form action
+        fileDeleteModal.classList.remove('hidden');
+    }
+
+    function closeDeleteFileModal() {
+        fileDeleteModal.classList.add('hidden');
+    }
+
+    // Close modals when clicking outside of them
+    window.addEventListener('click', (event) => {
+        if (event.target === fileModal) {
+            closeAddFileModal();
+        } else if (event.target === fileDeleteModal) {
+            closeDeleteFileModal();
+        }
+    });
+</script>
+{% endblock %}

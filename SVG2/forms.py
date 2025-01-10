@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Note, Notification
+from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Note, Notification, FinancialFile
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from datetime import datetime, date, time
@@ -306,4 +306,16 @@ class NoteForm(forms.ModelForm):
         fields = ['content']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Enter a reminder...'}),
+        }
+
+class FinancialFileForm(forms.ModelForm):
+    class Meta:
+        model = FinancialFile
+        fields = ['title', 'file']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-input block w-full',
+                'placeholder': 'Enter file title'
+            }),
+            'file': forms.ClearableFileInput(attrs={'class': 'form-input block w-full'}),
         }

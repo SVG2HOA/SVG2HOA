@@ -18,13 +18,13 @@ from collections import Counter
 from datetime import date, timedelta, datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from .forms import UserSignUpForm, ReservationForm, CustomLoginForm, HouseholdForm, ResidentForm, RememberMeAuthenticationForm, ReservationStatusForm, ServiceRequestForm, ServiceRequestStatusForm, BillingStatusForm, NewsfeedForm, NewsletterForm, OfficerChangeForm, MemberChangeForm, ContactForm, AnnouncementForm, GrievanceForm, GrievanceStatusForm, NoteForm
+from .forms import UserSignUpForm, ReservationForm, CustomLoginForm, HouseholdForm, ResidentForm, RememberMeAuthenticationForm, ReservationStatusForm, ServiceRequestForm, ServiceRequestStatusForm, BillingStatusForm, NewsfeedForm, NewsletterForm, OfficerChangeForm, MemberChangeForm, ContactForm, AnnouncementForm, GrievanceForm, GrievanceStatusForm, NoteForm, FinancialFileForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Household, Resident, Reservation, Billing, ServiceRequest, Newsfeed, Officer, User, Announcement, GrievanceAppointment, Note, Notification, Member, Officer
+from .models import Household, Resident, Reservation, Billing, ServiceRequest, Newsfeed, Officer, User, Announcement, GrievanceAppointment, Note, Notification, Member, Officer, FinancialFile
 from django.contrib import messages
 from django.http import Http404
 from django.views.generic.list import ListView
@@ -1526,6 +1526,58 @@ def eventscalendar(request, username, year=None, month=None):
 
     return render(request, 'member/events/calendar.html', context)
 
+#member_views_reports
+
+@login_required
+@user_passes_test(is_member, login_url='/login')
+def financial_status(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+    files = FinancialFile.objects.all()
+
+     # Get search query from request
+    search_query = request.GET.get('search', '')
+    if search_query:
+        files = files.filter(
+            Q(title__icontains=search_query) |
+            Q(uploaded_at__icontains=search_query)
+        )
+
+    # Get sorting criteria from query parameters
+    sort_by = request.GET.get('sort', 'uploaded_at')  # Default sort by `uploaded_at`
+    direction = request.GET.get('direction', 'desc')  # Default direction is descending
+
+    # Sort files based on the selected column and direction
+    if sort_by in ['title', 'uploaded_at']:
+        files = files.order_by(f"{'' if direction == 'asc' else '-'}{sort_by}")
+    else:
+        files = files.order_by('-uploaded_at')  # Default fallback sorting
+
+    # Paginate the results
+    paginator = Paginator(files, 6)  # Show 6 files per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Prepare context for the template
+    context = {
+        'files': page_obj,
+        'sort_by': sort_by,
+        'direction': direction,
+        'search_query': search_query,
+    }
+
+    return render(request, 'member/financial_status.html', context)
+
+@login_required
+@user_passes_test(is_member, login_url='/login')
+def download_file(request, username, file_id):
+    financial_file = get_object_or_404(FinancialFile, id=file_id)
+    response = HttpResponse(financial_file.file, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{financial_file.file.name.split("/")[-1]}"'
+    return response
+
 #officer_views_dashboard
 @login_required
 @user_passes_test(is_officer, login_url='/login')
@@ -2894,6 +2946,115 @@ def events_calendar(request, username, year=None, month=None):
     }
 
     return render(request, 'officer/events/calendar.html', context)
+
+#officer_views_reports
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def upload_financial_file(request, username):
+    # Ensure the username in the URL matches the logged-in user
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    
+    user = request.user
+
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)
+
+    if request.method == 'POST':
+        form = FinancialFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            creating_officer = request.user
+            financial_file = form.save(commit=False)
+            financial_file.uploaded_by = creating_officer
+            financial_file.save()
+
+            messages.success(request, 'File uploaded successfully!', extra_tags="file_upload")
+
+            # Notify all officers except the uploading officer
+            officers = User.objects.filter(is_officer=True).exclude(id=creating_officer.id)
+            for officer in officers:
+                Notification.objects.create(
+                    recipient=officer,
+                    content=f"New Financial Statement: {financial_file.title} has been uploaded by {creating_officer.fname} {creating_officer.lname}.",
+                    created_at=timezone.now()
+                )
+
+            # Notify all members
+            members = User.objects.filter(is_member=True)
+            for member in members:
+                Notification.objects.create(
+                    recipient=member,
+                    content=f"New Financial Statement: {financial_file.title} is now available.",
+                    created_at=timezone.now()
+                )
+
+            return redirect('upload_financial_file', username=request.user.username)
+        else:
+            messages.error(request, 'File upload failed! Please check the form and try again.')
+
+    else:
+        form = FinancialFileForm()
+
+    # Retrieve all financial files
+    files = FinancialFile.objects.all()
+
+    # Get search query from request
+    search_query = request.GET.get('search', '')
+    if search_query:
+        files = files.filter(
+            Q(title__icontains=search_query) |
+            Q(uploaded_at__icontains=search_query)
+        )
+
+    # Get sorting criteria from query parameters
+    sort_by = request.GET.get('sort', 'uploaded_at')  # Default sort by `uploaded_at`
+    direction = request.GET.get('direction', 'desc')  # Default direction is descending
+
+    # Sort files based on the selected column and direction
+    if sort_by in ['title', 'uploaded_at']:
+        files = files.order_by(f"{'' if direction == 'asc' else '-'}{sort_by}")
+    else:
+        files = files.order_by('-uploaded_at')  # Default fallback sorting
+
+    # Paginate the results
+    paginator = Paginator(files, 6)  # Show 6 files per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Prepare context for the template
+    context = {
+        'form': form,
+        'files': page_obj,
+        'sort_by': sort_by,
+        'direction': direction,
+        'search_query': search_query,
+    }
+
+    return render(request, 'officer/upload_financial_file.html', context)
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def dl_file(request, username, file_id):
+    financial_file = get_object_or_404(FinancialFile, id=file_id)
+    response = HttpResponse(financial_file.file, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{financial_file.file.name.split("/")[-1]}"'
+    return response
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def delete_file(request, username, file_id):
+    file = get_object_or_404(FinancialFile, id=file_id)
+
+    if request.method == "POST":
+        file.delete()
+        messages.success(request, 'File deleted successfully!', extra_tags="file_upload")
+        return redirect('upload_financial_file', username=request.user.username)
+
+    messages.error(request, "Invalid request.")
+    return redirect('upload_financial_file', username=request.user.username)
 
 #officer_views_notif
 class OfficerNotificationsView(RoleRequiredMixin, View):
