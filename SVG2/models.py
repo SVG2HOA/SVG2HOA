@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary.models import CloudinaryField
 
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
@@ -24,7 +26,7 @@ class User(AbstractUser):
     lname = models.CharField(max_length=30)
     is_member = models.BooleanField(default=False)
     is_officer = models.BooleanField(default=False)
-    profile_picture = models.ImageField(upload_to='C:/HOA_MIS/media/profile_pics/', blank=True, null=True)  # Optional field for profile picture
+    profile_picture = CloudinaryField('profile_pics', blank=True, null=True) # Optional field for profile picture
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # Optional field for phone number
     birthdate = models.DateField(null=True, blank=True)  # Optional field for birthdate
     email = models.EmailField(unique=True)
@@ -252,7 +254,7 @@ class ServiceRequest(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     service_type = models.CharField(max_length=20, choices=SERVICE_CHOICES, default='Maintenance Request')
-    image = models.ImageField(upload_to='service_requests/', blank=True, null=True)
+    image = CloudinaryField('service_requests', blank=True, null=True)
     household = models.ForeignKey(Household, on_delete=models.CASCADE, related_name='service_requests')
     status = models.CharField(max_length=20, choices=REQUEST_STATUS_CHOICES, default='Submitted')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -286,7 +288,7 @@ class Newsfeed(models.Model):
     written_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='news_notices')
     title = models.CharField(max_length=255)
     description = models.TextField()
-    image = models.ImageField(upload_to='news_notices/', blank=True, null=True)  # Ensure you have Pillow installed
+    image = CloudinaryField('news', blank=True, null=True)  # Ensure you have Pillow installed
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # Any other fields you think are necessary
@@ -300,7 +302,7 @@ class Announcement(models.Model):
     date = models.DateField()
     time = models.TimeField()
     where = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='announcements_images/', null=True, blank=True)
+    image = CloudinaryField('announcements', null=True, blank=True)
 
     def __str__(self):
         return f"Announcement on {self.date} at {self.time}"
@@ -316,7 +318,7 @@ class GrievanceAppointment(models.Model):
     subject = models.CharField(max_length=255)
     reservation_date = models.DateField()
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='appointments/', blank=True, null=True)  # Ensure you have Pillow installed
+    image = CloudinaryField('appointments', blank=True, null=True)  # Ensure you have Pillow installed
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     STATUS_CHOICES = (

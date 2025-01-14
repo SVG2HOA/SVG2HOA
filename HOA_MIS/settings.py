@@ -1,6 +1,9 @@
 import os
 import dj_database_url
 import base64
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 from pathlib import Path
 from django.conf import settings
 
@@ -12,7 +15,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h)=0ikgj6s+vsrhpwrp)5=6z+7#q&#3u2%=mx-k_r@&*re)j48'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-h)=0ikgj6s+vsrhpwrp)5=6z+7#q&#3u2%=mx-k_r@&*re)j48')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
@@ -35,7 +39,24 @@ INSTALLED_APPS = [
     'SVG2',
     'django_browser_reload',
     'widget_tweaks',
+    'cloudinary',
+    'cloudinary_storage',
 ]
+
+cloudinary.config(
+    cloud_name='dir68lm7d',
+    api_key='186983436286294',
+    api_secret='aDtbR1wBWXFGLbZGs9mh-SvyeQQ',
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dir68lm7d',
+    'API_KEY': '186983436286294',
+    'API_SECRET': 'aDtbR1wBWXFGLbZGs9mh-SvyeQQ',
+}
+
 
 TAILWIND_APP_NAME = 'theme'
 
@@ -46,6 +67,7 @@ INTERNAL_IPS = [
 NPM_BIN_PATH = 'C:/Program Files/nodejs/npm.cmd'
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,7 +76,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'HOA_MIS.urls'

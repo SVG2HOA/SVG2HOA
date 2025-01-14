@@ -67,12 +67,12 @@ class ReservationAdmin(admin.ModelAdmin):
 
 @admin.register(ServiceRequest)
 class ServiceRequestAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'household', 'service_type', 'created_at', 'updated_at', 'status']
+    list_display = ['pk', 'household', 'service_type', 'created_at', 'updated_at', 'status', 'image']
     ordering = ['pk', 'household', 'service_type', 'created_at', 'updated_at', 'status']
 
 @admin.register(GrievanceAppointment)
 class GrievanceAppointmentAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'household', 'appointment_type', 'subject', 'created_at', 'updated_at', 'reservation_date',  'status']
+    list_display = ['pk', 'household', 'appointment_type', 'subject', 'created_at', 'updated_at', 'reservation_date',  'status', 'image']
     ordering = ['pk', 'household', 'appointment_type', 'subject', 'created_at', 'updated_at', 'reservation_date', 'status']
 
 @admin.register(Billing)
@@ -82,7 +82,7 @@ class BillingAdmin(admin.ModelAdmin):
 
 @admin.register(Newsfeed)
 class NewsfeedAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'written_by', 'pos', 'title', 'created_at', 'updated_at']
+    list_display = ['pk', 'written_by', 'pos', 'title', 'created_at', 'updated_at', 'image']
     ordering = ['pk', 'written_by', 'created_at']
     def pos(self, obj):
         return obj.written_by.officer_profile.officer_position
@@ -91,8 +91,11 @@ class NewsfeedAdmin(admin.ModelAdmin):
 class FinancialFileAdmin(admin.ModelAdmin):
     list_display = ('title', 'uploaded_at', 'uploaded_by', 'file_size')
 
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ('who', 'what', 'date', 'time', 'where', 'image')
+
 admin.site.register(User, UserAdmin)
 admin.site.register(NewsletterSubscriber)
 admin.site.register(ContactSender)
-admin.site.register(Announcement)
 admin.site.register(Notification)

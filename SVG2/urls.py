@@ -122,4 +122,7 @@ urlpatterns = [
 
     path("<username>/household/billing/<int:billing_id>/", create_payment_link, name="create_payment_link"),
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
