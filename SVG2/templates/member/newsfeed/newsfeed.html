@@ -37,7 +37,7 @@ Newsfeed
 				<div class="relative group bg-green-800 w-full h-64 sm:h-80 lg:h-96 overflow-hidden hover:scale-105 transition duration-200">
 					<div class="absolute inset-0 bg-black group-hover:bg-opacity-0 bg-opacity-15 transition duration-300"></div>
 					{% if latest_announcement.image %}
-					<img class="absolute left-0 w-1/2 h-full object-cover bg-white" src="{{ latest_announcement.image.url }}" alt="Announcement">
+					<img class="absolute left-0 w-1/2 h-full object-cover bg-white" src="{{ latest_announcement.image.url }}" alt="{{ latest_announcement.what }}">
 					{% else %}
 					<div class="absolute left-0 w-1/2 h-full flex items-center justify-center bg-gray-200 text-gray-500">
 						No Image Available

@@ -80,7 +80,7 @@ News
             <a href="{% url 'news_article' pk=latest_news.id %}" class="w-full hover:scale-105 transition duration-200 relative group">
                 <div class="relative w-full h-64 sm:h-80 lg:h-96 overflow-hidden">
                     {% if latest_news.image %}
-                    <img class="w-full h-full object-cover bg-white" src="{{ latest_news.image.url }}" alt="{{ latest_news.pk }}">
+                    <img class="w-full h-full object-cover bg-white" src="{{ latest_news.image.url }}" alt="{{ latest_news.what }}">
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
                         No Image Available

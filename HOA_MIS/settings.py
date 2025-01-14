@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-h)=0ikgj6s+vsrhpwrp)5=6z+7#q&#3u2%=mx-k_r@&*re)j48
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['svg2hoa.onrender.com', '127.0.0.1', 'svgardens2.onrender.com']
+ALLOWED_HOSTS = ['svg2hoa.onrender.com', '127.0.0.1']
 
 
 
@@ -94,10 +94,9 @@ WSGI_APPLICATION = 'HOA_MIS.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Backend for SQLite
-        'NAME': BASE_DIR / 'db.sqlite3',         # Database file location
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'postgresql://svg2hoadatabase_09ec_user:SnyeJDQBsGEjCZBYk31bki46k0TbLmqW@dpg-ctrccctds78s73dkgge0-a.singapore-postgres.render.com/svg2hoadatabase_09ec')
+    )
 }
 
 AUTH_USER_MODEL = 'SVG2.User'
@@ -170,4 +169,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'springvillegardens2hoa@gmail.com'
 EMAIL_HOST_PASSWORD = 'lelq llzs tqdq itjm'
-DEFAULT_FROM_EMAIL = 'springvillegardens2hoa@gmail.com'
+DEFAULT_FROM_EMAIL = 'springvillegardens2hoa.onrender.com'
