@@ -77,7 +77,10 @@
         {% endif %}
     </div>
 </li>
-   
+{% empty %}
+<li class="text-center w-full p-8">
+ No notifications.
+</li>
           {% endfor %}
         </ul>
     </div>
