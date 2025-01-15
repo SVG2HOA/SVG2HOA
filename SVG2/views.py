@@ -2718,7 +2718,7 @@ def update_appointment_status(request, username, grievanceappointment_id):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def manage_users(request, username):
-    if username != request.user.username:
+    if request.user.username != username:
         messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
         return redirect('login')
     user = request.user
@@ -2784,7 +2784,6 @@ def toggle_user_activation(request, username, user_id):
         user.is_active = not user.is_active
         user.save()
 
-        
         # Create a notification for the user whose account was toggled
         action = "activated" if user.is_active else "deactivated"
         Notification.objects.create(
@@ -2794,9 +2793,10 @@ def toggle_user_activation(request, username, user_id):
         )
 
         # Optionally, add a success message to the request
-        messages.success(request, f"User {request.user.fname} {request.user.lname} has been {action}!", extra_tags="user_message")
+        messages.success(request, f"User {user.fname} {user.lname} has been {action}!", extra_tags="user_message")
 
-    return redirect('manage_users', username=user.username)
+    # Redirect to the manage_users view using the officer's username
+    return redirect('manage_users', username=request.user.username)
 
 @login_required
 @user_passes_test(is_officer, login_url='/login')
@@ -2810,7 +2810,7 @@ def delete_user(request, username, pk):
         # Delete the user
         user.delete()
 
-        messages.success(request, f"User {request.user.fname} {request.user.lname} has been deleted successfully!", extra_tags="user_message")
+        messages.success(request, f"User {deleted_user_name} has been deleted successfully!", extra_tags="user_message")
         # Notify all officers except the one performing the deletion
         officers = User.objects.filter(is_officer=True).exclude(id=request.user.id)
         for officer in officers:

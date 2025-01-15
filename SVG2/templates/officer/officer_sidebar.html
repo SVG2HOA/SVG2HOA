@@ -11,12 +11,35 @@
             </svg>
         </button>
         <a href="{% url 'officer_landing_page' user.username %}" class="flex md:mr-24 truncate">
-          <img src="{% static 'images/icon.png' %}" class="h-8 mx-2 mb-1 hover:scale-105 " alt="SVG2 Logo" />
-          <p class="sm:inline self-center text-lg text-green-700 font-bold hover:text-green-500 sm:text-2xl truncate dark:text-white">
-              Springville Gardens 2
-          </p>
-      </a>
+            <img src="{% static 'images/icon.png' %}" class="h-8 mx-2 mb-1 hover:scale-105 " alt="SVG2 Logo" />
+            <p id="site-title" class="self-center text-lg text-green-700 font-bold hover:text-green-500 sm:text-2xl truncate dark:text-white">
+                Springville Gardens 2
+            </p>
+        </a>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+    const siteTitle = document.getElementById("site-title");
+
+    // Function to check screen size and toggle visibility
+    const toggleSiteTitle = () => {
+        if (window.innerWidth < 640) {
+            siteTitle.style.display = "none"; // Hide on smaller screens
+        } else {
+            siteTitle.style.display = "inline"; // Show on larger screens
+        }
+    };
+
+    // Initial check on page load
+    toggleSiteTitle();
+
+    // Re-check on window resize
+    window.addEventListener("resize", toggleSiteTitle);
+});
+
+    </script>
+    
+    
     
       <div class="flex items-center mr-4">
         <div class="flex items-center ms-3 gap-x-2">
@@ -30,8 +53,9 @@
       </svg>
       {% if unread_count > 0 %}
       <span class="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs px-1 mr-2" id="unread-count">
-          {{ unread_count }}
-      </span>
+        {{ unread_count }}
+    </span>
+    
       {% endif %}
   </button>
 
@@ -91,10 +115,10 @@
     </div>
           <!-- Profile Picture Button -->
           <div>
-            <button type="button" class="flex text-sm bg-green-700 rounded-full focus:ring-4 focus:ring-green-500 dark:focus:ring-green-500 {% if request.resolver_match.url_name == 'officer_profile_info' or request.resolver_match.url_name == 'officer_update_profile' %} ring-4 ring-green-500 {% endif %}" id="profile-button" aria-expanded="false" data-dropdown-toggle="dropdown-user">
+            <button type="button" class="flex text-sm bg-green-700 rounded-full focus:ring-4 focus:ring-green-500 shrink-0 {% if request.resolver_match.url_name == 'officer_profile_info' or request.resolver_match.url_name == 'officer_update_profile' %} ring-4 ring-green-500 {% endif %}" id="profile-button" aria-expanded="false" data-dropdown-toggle="dropdown-user">
               <span class="sr-only">Open user menu</span>
               {% if user.profile_picture %}
-              <img class="w-10 h-10 rounded-full" src="{{ user.profile_picture.url }}" alt="">
+              <img class="w-10 h-10 rounded-full object-cover shrink-0" src="{{ user.profile_picture.url }}" alt="{{ user.username }}">
               {% else %}
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-9 text-green-700 hover:text-green-500">
                 <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />

@@ -11,11 +11,32 @@
         </button>
         <a href="{% url 'member_landing_page' user.username %}" class="flex md:mr-24 truncate">
             <img src="{% static 'images/icon.png' %}" class="h-8 mx-2 mb-1 hover:scale-105 " alt="SVG2 Logo" />
-            <p class="sm:inline self-center text-lg text-white font-bold hover:text-yellow-200 sm:text-2xl truncate dark:text-white">
+            <p id="site-title" class="self-center text-lg text-white font-bold hover:text-yellow-200 sm:text-2xl truncate dark:text-white">
                 Springville Gardens 2
             </p>
         </a>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+    const siteTitle = document.getElementById("site-title");
+
+    // Function to check screen size and toggle visibility
+    const toggleSiteTitle = () => {
+        if (window.innerWidth < 640) {
+            siteTitle.style.display = "none"; // Hide on smaller screens
+        } else {
+            siteTitle.style.display = "inline"; // Show on larger screens
+        }
+    };
+
+    // Initial check on page load
+    toggleSiteTitle();
+
+    // Re-check on window resize
+    window.addEventListener("resize", toggleSiteTitle);
+});
+
+    </script>
     
       <div class="flex items-center mr-4">
         <div class="flex items-center ms-3 gap-x-2">
