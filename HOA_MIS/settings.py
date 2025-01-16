@@ -41,7 +41,23 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'cloudinary',
     'cloudinary_storage',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
+
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'language': 'en',
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'link', '|',
+            'bulletedList', 'numberedList', 'blockQuote', '|',
+            'undo', 'redo',
+        ],
+        'extraPlugins': ','.join(['fontColor', 'fontBackgroundColor', 'alignment']),  # Add color and alignment plugins
+    },
+}
+
 
 cloudinary.config(
     cloud_name='dir68lm7d',

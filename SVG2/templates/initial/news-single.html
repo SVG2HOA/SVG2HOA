@@ -45,12 +45,12 @@
             
             <h2 class="text-3xl font-semibold text-gray-900 dark:text-white mb-4">{{ newsfeed.title }}</h2>
             
-            <div class="flex flex-col">
+            <div class="flex flex-col text-gray-800">
                 {% if newsfeed.image %}
                     <img class="w-full rounded-md mb-6 lg:mr-6" src="{{ newsfeed.image.url }}" alt="{{ newsfeed.title }}">
                 {% endif %}
-                <p class="text-gray-800 dark:text-gray-200 text-justify">
-                    {{ newsfeed.description }}
+                <p class="text-black text-justify">
+                    {{ newsfeed.description|safe }}
                 </p>
             </div>
         </div>
@@ -58,35 +58,34 @@
   
     <div class="container mx-auto w-full lg:w-1/4 flex-grow">
         <div class="bg-white w-full dark:bg-black rounded-md shadow-lg p-6 md:p-8">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">More news articles</h2>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">More news articles</h2>  
             
             <div class="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 w-full justify-center gap-2">
-            {% for article in newsfeeds %}
-                {% if article.id != newsfeed.id %}
-                    <div class="animate_top shadow-lg col-span-1 lg:w-full flex flex-col items-center rounded-lg">
-            <a href="{% url 'news_article' pk=article.id %}" class="w-full hover:scale-105 transition duration-200 relative group">
-                <div class="relative w-full sm:h-80 lg:max-h-48 overflow-hidden rounded-lg">
-                    {% if article.image %}
-                    <img class="w-full h-full object-cover bg-white" src="{{ article.image.url }}" alt="{{ article.pk }}">
-                    {% else %}
-                    <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
-                        No Image Available
-                    </div>
-                    {% endif %}
-                    <div class="absolute inset-0 bg-black group-hover:bg-opacity-0 bg-opacity-15 transition duration-300"></div>
-                    <div class="absolute bottom-0 left-0 w-full bg-white bg-opacity-60 hover:bg-opacity-80 text-gray-900 text-left p-2">
-                        <h4 class="font-semibold text-md truncate">{{ article.title }}</h4>
-                        <p class="truncate text-sm">{{ article.created_at|date:"F j, Y" }}</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% else %}
-                
-        <p class="text-center text-gray-500">There is no other news.</p>
-        {% endif %}
-                {% endfor %}
-        </div>
+                {% if newsfeeds %}
+                    {% for article in newsfeeds %}
+                        <div class="animate_top shadow-lg col-span-1 lg:w-full flex flex-col items-center rounded-lg">
+                            <a href="{% url 'news_article' pk=article.id %}" class="w-full hover:scale-105 transition duration-200 relative group">
+                                <div class="relative w-full sm:h-80 lg:max-h-36 overflow-hidden rounded-lg">
+                                    {% if article.image %}
+                                        <img class="w-full h-full object-cover bg-white" src="{{ article.image.url }}" alt="{{ article.pk }}">
+                                    {% else %}
+                                        <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                                            No Image Available
+                                        </div>
+                                    {% endif %}
+                                    <div class="absolute inset-0 bg-black group-hover:bg-opacity-0 bg-opacity-15 transition duration-300"></div>
+                                    <div class="absolute bottom-0 left-0 w-full bg-white bg-opacity-60 hover:bg-opacity-80 text-gray-900 text-left p-2">
+                                        <h4 class="font-semibold text-md truncate">{{ article.title }}</h4>
+                                        <p class="truncate text-sm">{{ article.created_at|date:"F j, Y" }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-gray-500">There is no other news.</p>
+                {% endif %}
+            </div>
     </div>
 </div>
 

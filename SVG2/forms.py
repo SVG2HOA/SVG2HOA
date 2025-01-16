@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from datetime import datetime, date, time
 from django.contrib.auth import authenticate
-
+from ckeditor.widgets import CKEditorWidget
 
 User = get_user_model()
 
@@ -258,12 +258,10 @@ class BillingStatusForm(forms.ModelForm):
         fields = ['status']
 
 class NewsfeedForm(forms.ModelForm):
+    description = forms.CharField(widget=CKEditorWidget(), label="Article Content")
     class Meta:
         model = Newsfeed
         fields = ['title','description', 'image']
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 5}),
-        }
 
 class ServiceRequestStatusForm(forms.ModelForm):
     class Meta:

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from cloudinary_storage.storage import MediaCloudinaryStorage
 from cloudinary.models import CloudinaryField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
@@ -284,14 +285,12 @@ class Billing(models.Model):
         unique_together = ('household', 'billing_month')  # Ensure one billing entry per household per month
 
 class Newsfeed(models.Model):
-
     written_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='news_notices')
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    image = CloudinaryField('news', blank=True, null=True)  # Ensure you have Pillow installed
+    description = RichTextUploadingField(config_name='default') 
+    image = CloudinaryField('news', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # Any other fields you think are necessary
 
     def __str__(self):
         return f'{self.written_by.officer_profile.officer_position} - {self.title} - {self.created_at}'

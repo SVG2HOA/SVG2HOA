@@ -157,9 +157,15 @@ def news(request):
     return render(request, 'initial/news.html', {'newsfeeds': newsfeeds, 'latest_announcement': latest_announcement, 'latest_news': latest_news})
     
 def news_article(request, pk):
-    newsfeeds = Newsfeed.objects.all().order_by('-created_at')
+    newsfeeds = Newsfeed.objects.exclude(id=pk).order_by('-created_at')
+    
+    # Get the specific newsfeed object
     newsfeed = get_object_or_404(Newsfeed, pk=pk)
-    return render(request, 'initial/news-single.html', {'newsfeeds': newsfeeds, 'newsfeed': newsfeed})
+
+    return render(request, 'initial/news-single.html', {
+        'newsfeeds': newsfeeds,
+        'newsfeed': newsfeed
+    })
 
 def about(request):
     officer_hierarchy = {
@@ -437,10 +443,16 @@ def newsarticle(request, username, pk):
         messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
         return redirect('login')
 
-    newsfeeds = Newsfeed.objects.all().order_by('-created_at')
+    newsfeeds = Newsfeed.objects.exclude(id=pk).order_by('-created_at')
+    
+    # Get the specific newsfeed object
     newsfeed = get_object_or_404(Newsfeed, pk=pk)
-    return render(request, 'member/newsfeed/newsarticle.html', {'newsfeed': newsfeed, 'newsfeeds': newsfeeds})
 
+    return render(request, 'member/newsfeed/newsarticle.html', {
+        'newsfeeds': newsfeeds,
+        'newsfeed': newsfeed
+    })
+    
 #member_views_household
 class HouseholdDetailsView(RoleRequiredMixin, TemplateView):
     allowed_roles = ['is_member']
@@ -1539,7 +1551,6 @@ def eventscalendar(request, username, year=None, month=None):
     return render(request, 'member/events/calendar.html', context)
 
 #member_views_reports
-
 @login_required
 @user_passes_test(is_member, login_url='/login')
 def financial_status(request, username):
@@ -1717,12 +1728,22 @@ def news_feed(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def news_single(request, username, pk):
+    # Check if the username in the URL matches the logged-in user
     if username != request.user.username:
         messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
         return redirect('login')
-    newsfeeds = Newsfeed.objects.all().order_by('-created_at')
+    
+    # Get all newsfeeds except the one with the specified pk
+    newsfeeds = Newsfeed.objects.exclude(id=pk).order_by('-created_at')
+    
+    # Get the specific newsfeed object
     newsfeed = get_object_or_404(Newsfeed, pk=pk)
-    return render(request, 'officer/newsfeed/news_article.html', {'newsfeeds': newsfeeds, 'newsfeed': newsfeed})
+    
+    # Render the template with both the specific newsfeed and the filtered list of newsfeeds
+    return render(request, 'officer/newsfeed/news_article.html', {
+        'newsfeeds': newsfeeds,
+        'newsfeed': newsfeed
+    })
 
 @login_required
 @user_passes_test(is_officer, login_url='/login')

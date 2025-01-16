@@ -91,7 +91,7 @@ Newsfeed
 						<div class="absolute inset-0 bg-black group-hover:bg-opacity-0 bg-opacity-15 transition duration-300"></div>
 						<div class="absolute bottom-0 left-0 w-full bg-white bg-opacity-60 hover:bg-opacity-80 text-gray-900 text-left p-2">
 							<h4 class="font-semibold text-md sm:text-lg truncate">{{ latest_news.title }}</h4>
-							<p class="truncate text-sm sm:text-md">{{ latest_news.description }}</p>
+							<p class="truncate text-sm sm:text-md">{{ latest_news.description|striptags }}</p>
 							<p class="truncate text-sm sm:text-md">{{ latest_news.created_at|date:"F j, Y" }}</p>
 						</div>
 					</div>
@@ -118,7 +118,7 @@ Newsfeed
 					<div class="absolute inset-0 bg-black group-hover:bg-opacity-0 bg-opacity-15 transition duration-300"></div>
 					<div class="absolute bottom-0 left-0 w-full bg-white bg-opacity-60 hover:bg-opacity-80 text-gray-900 text-left p-2">
 						<h4 class="font-semibold text-lg sm:text-xl truncate">{{ newsfeed.title }}</h4>
-						<p class="truncate">{{ newsfeed.description }}</p>
+						<p class="truncate">{{ newsfeed.description|striptags }}</p>
 						<p>{{ newsfeed.created_at|date:"F j, Y" }}</p>
 					</div>
 				</div>
