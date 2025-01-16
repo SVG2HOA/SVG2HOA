@@ -37,7 +37,8 @@ from django.utils import timezone
 from django.core.paginator import Paginator
 from decimal import Decimal
 import logging
-
+from pathlib import Path
+import os
 
 
 User = get_user_model()
@@ -1559,7 +1560,12 @@ def financial_status(request, username):
         return redirect('login')
     user = request.user
     files = FinancialFile.objects.all()
-
+    for file in files:
+        file_path = os.path.join(settings.MEDIA_ROOT, file.file.name)  # Use the `file` field
+        if not os.path.exists(file_path):
+            file.exists = False
+        else:
+            file.exists = True
      # Get search query from request
     search_query = request.GET.get('search', '')
     if search_query:
@@ -3033,7 +3039,12 @@ def upload_financial_file(request, username):
 
     # Retrieve all financial files
     files = FinancialFile.objects.all()
-
+    for file in files:
+        file_path = os.path.join(settings.MEDIA_ROOT, file.file.name)  # Use the `file` field
+        if not os.path.exists(file_path):
+            file.exists = False
+        else:
+            file.exists = True
     # Get search query from request
     search_query = request.GET.get('search', '')
     if search_query:
