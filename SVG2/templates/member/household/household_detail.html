@@ -45,7 +45,7 @@ Household Profile
           </div>
           <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
             <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Owner Name:</dt>
-            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ household.owner_name.fname }} {{ household.owner_name.lname }}</dd>
+            <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">{{ household.owner_name.fname|title }} {{ household.owner_name.lname|title }}</dd>
           </div>
           <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
             <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Address:</dt>
@@ -118,9 +118,9 @@ Household Profile
                     <tr class="bg-white text-gray-700 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             <a href="{% url 'resident_detail' user.username resident.id %}"
-                                class="font-medium hover:text-blue-600">{{ resident.first_name }} {{ resident.last_name }}</a>
+                                class="font-medium hover:text-blue-600">{{ resident.first_name|title }} {{ resident.last_name|title }}</a>
                         </th>
-                        <td class="px-6 py-4 text-gray-600">{{ resident.relation_to_head }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ resident.relation_to_head|title }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ resident.email }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ resident.birthdate }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ resident.contact_number }}</td>

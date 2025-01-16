@@ -81,10 +81,10 @@
                 </div>
             </a>
         </div>
-                    {% endif %}
-                    {% empty %}
-              
-                    <p class="text-center text-gray-500">There is no other news.</p>
+        {% else %}
+                
+        <p class="text-center text-gray-500">There is no other news.</p>
+        {% endif %}
                 {% endfor %}
         </div>
     </div>

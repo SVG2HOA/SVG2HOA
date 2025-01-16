@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import LoginSignupView, member_landing_page, officer_landing_page, edit_household, add_household, add_resident, resident_detail, edit_resident, logout_view, make_reservation, ReservationListView, update_reservation_status, cancel_reservation, cancel_request, ViewAppointment, update_appointment_status
-from .views import HouseholdListView, ResidentListView, HouseholdDetailView, HouseholdDetailsView, EditHousehold, submit_request, update_request, edit_billing_status, EditResident, ViewResidentInfo, newsfeed, news_feed, add_news, edit_news, RequestListView, update_request_status, AppointmentListView, calendar
+from .views import HouseholdListView, ViewUserInfo, EditUserInfo, ResidentListView, HouseholdDetailView, HouseholdDetailsView, EditHousehold, submit_request, update_request, edit_billing_status, EditResident, ViewResidentInfo, newsfeed, news_feed, add_news, edit_news, RequestListView, update_request_status, AppointmentListView, calendar
 from .views import subscribe_newsletter, events_calendar, eventscalendar, news_article, officer_profile_info, officer_update_profile, about, member_profile_info, member_update_profile, communitymap, MyReservation, MyRequest, ViewRequest, MyAppointment, make_appointment, cancel_appointment, update_appointment, update_reservation
 from .views import OfficerNotificationsView, MemberNotificationsView, create_payment_link, send_activation_email
 from django.conf import settings
@@ -106,8 +106,10 @@ urlpatterns = [
     path('officer/<username>/appointment-list/update-status/<int:grievanceappointment_id>/status/', update_appointment_status, name='update_appointment_status'),
     #officer user management
     path('officer/<username>/manage_users/', views.manage_users, name='manage_users'),
-    path('officer/<username>/manage_users/delete/<int:pk>/', views.delete_user, name='delete_user'),
-    path('officer/<username>/manage_users/toggle_user_activation/<int:user_id>/', views.toggle_user_activation, name='toggle_user_activation'),
+    path('officer/<username>/manage_users/<int:user_id>', ViewUserInfo.as_view(), name='user_profile'),
+    path('officer/<username>/manage_users/<int:user_id>/update', EditUserInfo.as_view(), name='edit_user'),
+    path('officer/<username>/manage_users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
+    path('officer/<username>/manage_users/<int:user_id>/toggle_user_activation/', views.toggle_user_activation, name='toggle_user_activation'),
     #officer events calendar
     path('officer/<username>/events_calendar/', views.events_calendar, name='events_calendar'),
     path('officer/<username>/events_calendar/<int:year>/<int:month>/', events_calendar, name='cal_w_date'),

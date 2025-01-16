@@ -2800,8 +2800,8 @@ def toggle_user_activation(request, username, user_id):
 
 @login_required
 @user_passes_test(is_officer, login_url='/login')
-def delete_user(request, username, pk):
-    user = get_object_or_404(User, pk=pk)
+def delete_user(request, username, user_id):
+    user = get_object_or_404(User, id=user_id)
 
     if request.method == 'POST':
         # Save the deleted user's name for notification content
@@ -3078,3 +3078,73 @@ def mark_all_as_read(request):
     # Update all notifications for the logged-in user to mark them as read
     Notification.objects.filter(recipient=request.user, read=False).update(read=True)
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+class ViewUserInfo(RoleRequiredMixin, View):
+    allowed_roles = ['is_officer']
+    def get(self, request, username, user_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+        user_prof = get_object_or_404(User, id=user_id)
+        return render(request, 'officer/usermgt/user_profile.html', {'user_prof': user_prof})
+
+class EditUserInfo(RoleRequiredMixin, View):
+    allowed_roles = ['is_officer']
+    def get(self, request, username, user_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+        user_prof = get_object_or_404(User, id=user_id)
+        form = OfficerChangeForm(instance=user_prof)
+        assigned_roles = Officer.objects.exclude(user=user_prof).values_list('officer_position', flat=True)
+        available_roles_choices = [choice for choice in Officer.ROLES_CHOICES if choice[0] not in assigned_roles]
+        context = {
+        'user_prof': user_prof,
+        'form': form,
+        'roles_choices': available_roles_choices
+        }
+
+        return render(request, 'officer/usermgt/update_user_prof.html', context)
+
+    def post(self, request, username, user_id):
+        user_prof = get_object_or_404(User, id=user_id)
+        form = OfficerChangeForm(request.POST, request.FILES, instance=user_prof)
+        
+        if form.is_valid():
+            # Save the form
+            user_prof = form.save()
+
+            messages.success(request, "User updated successfully!", extra_tags="user_officer_update")
+            # Get the officer who made the edit
+            editing_officer = request.user
+
+            # Send a notification to the household (connected resident)
+            notification = Notification.objects.create(
+                recipient=user_prof,  # Assuming the notification relates to the household
+                content=f"Your profile has been updated by Officer {editing_officer.fname} {editing_officer.lname}.",
+                created_at=timezone.now()
+            )
+            notification.save()
+
+            # Send notifications to all other officers
+            officers = User.objects.filter(is_officer=True).exclude(id=editing_officer.id)
+            for officer in officers:
+                notification = Notification.objects.create(
+                    recipient=officer,
+                    content=f"User profile of {user_prof.fname} {user_prof.fname} have been updated by Officer {editing_officer.fname} {editing_officer.lname}.",
+                    created_at=timezone.now()
+                )
+                notification.save()
+
+            return redirect('user_profile', username=username, user_id=user_prof.id)
+        else:
+            form = OfficerChangeForm(instance=user_prof)
+        
+        assigned_roles = Officer.objects.exclude(user=user_prof).values_list('officer_position', flat=True)
+        available_roles_choices = [choice for choice in Officer.ROLES_CHOICES if choice[0] not in assigned_roles]
+
+        return render(request, 'officer/usermgt/update_user_prof.html', {
+            'user_prof': user_prof,
+            'form': form,
+            'roles_choices': available_roles_choices
+        })

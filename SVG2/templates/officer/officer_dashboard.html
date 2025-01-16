@@ -10,7 +10,7 @@ Dashboard
     <div class="w-full text-left bg-blue-200 rounded-xl py-2 px-4">
       <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 text-left">
         Welcome, {% if request.user.is_officer %}
-        {{ request.user.officer_profile.officer_position|default:"Officer" }}
+        Officer
         {{ request.user.username }}!
         {% endif %}
       </h2>

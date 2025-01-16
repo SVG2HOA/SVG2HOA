@@ -38,7 +38,7 @@
                   <img class="w-24 h-24 object-cover rounded-full mr-4 mb-4 sm:mb-0" src="{% static 'images/def-user.png' %}" alt="">
                   {% endif %}
                   <ul class="text-gray-700 dark:text-gray-300 text-center sm:text-left">
-                      <li class="text-2xl">{{ newsfeed.written_by.fname }} {{ newsfeed.written_by.lname }}</li>
+                      <li class="text-2xl">{{ newsfeed.written_by.fname|title }} {{ newsfeed.written_by.lname|title }}</li>
                       <li>Published on {{ newsfeed.created_at|date:"F j, Y" }}</li>
                       <li>
                         <a href="{% url 'edit_news' user.username newsfeed.id %}" 
@@ -87,10 +87,10 @@
                   </div>
               </a>
           </div>
-                      {% endif %}
-                      {% empty %}
+          {% else %}
                 
-                      <p class="text-center text-gray-500">There is no other news.</p>
+          <p class="text-center text-gray-500">There is no other news.</p>
+          {% endif %}
                   {% endfor %}
           </div>
       </div>

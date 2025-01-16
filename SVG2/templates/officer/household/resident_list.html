@@ -91,10 +91,11 @@ Resident List
                             {% for resident in residents %}
                                 <tr class="border-b text-gray-700 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <th scope="row" class="px-6 py-4 text-gray-900 font-semibold whitespace-nowrap dark:text-white">
-                                        <a href="{% url 'view_resident_info' username=request.user.username pk=resident.household.id resident_id=resident.id %}" class="font-medium hover:text-blue-600">{{ resident.first_name }} {{ resident.last_name }}</a>
+                                        <a href="{% url 'view_resident_info' username=request.user.username pk=resident.household.id resident_id=resident.id %}" class="font-medium hover:text-blue-600">{{ resident.first_name|title }} {{ resident.last_name|title }}
+                                        </a>
                                     </th>
                                     <td class="px-6 py-4">
-                                        {{ resident.household.owner_name.lname }}
+                                        {{ resident.household.owner_name.lname|title }}
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ resident.household.block }}

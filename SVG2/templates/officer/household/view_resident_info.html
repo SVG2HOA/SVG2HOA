@@ -64,19 +64,19 @@ Resident: {{ resident.first_name }}
                   
                   <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
                     <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">First Name</dt>
-                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.first_name }}</dd>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.first_name|title }}</dd>
                   </div>
                   <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
                     <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Middle Name</dt>
-                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.middle_name }}</dd>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.middle_name|title }}</dd>
                   </div>
                   <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
                     <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Last Name</dt>
-                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.last_name }}</dd>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.last_name|title }}</dd>
                   </div>
                   <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
                     <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Suffix</dt>
-                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.suffix }}</dd>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.suffix|title }}</dd>
                   </div>
                   <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
                     <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Gender</dt>
@@ -92,7 +92,7 @@ Resident: {{ resident.first_name }}
                   </div>
                   <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
                     <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Relation to Head</dt>
-                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.relation_to_head }}</dd>
+                    <dd class="text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ resident.relation_to_head|title }}</dd>
                   </div>
                   <div class="py-2 grid grid-cols-3 gap-4 sm:px-0 items-start">
                     <dt class="ml-4 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Email</dt>

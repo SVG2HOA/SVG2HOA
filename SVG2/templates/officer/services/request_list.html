@@ -106,7 +106,7 @@ Service Request List
                         <tr class="bg-white text-gray-700 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 <a href="{% url 'view_request' user.username servicerequest.id %}" class="font-medium hover:text-blue-600">
-                                    {{ servicerequest.household.owner_name.fname }} {{ servicerequest.household.owner_name.lname }}
+                                    {{ servicerequest.household.owner_name.fname|title }} {{ servicerequest.household.owner_name.lname|title }}
                                 </a>
                             </th>
                             <td class="px-6 py-4">
