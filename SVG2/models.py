@@ -361,7 +361,7 @@ class Notification(models.Model):
 
 class FinancialFile(models.Model):
     title = models.CharField(max_length=255)
-    file = models.FileField(upload_to='financial_files/')
+    file = CloudinaryField('file')  # Use CloudinaryField instead of FileField
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
