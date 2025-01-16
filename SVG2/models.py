@@ -5,6 +5,7 @@ from django.utils import timezone
 from cloudinary_storage.storage import MediaCloudinaryStorage
 from cloudinary.models import CloudinaryField
 from ckeditor_uploader.fields import RichTextUploadingField
+from cloudinary.api import resource
 
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
@@ -361,13 +362,17 @@ class Notification(models.Model):
 
 class FinancialFile(models.Model):
     title = models.CharField(max_length=255)
-    file = CloudinaryField('file')  # Use CloudinaryField instead of FileField
+    file = CloudinaryField('file')  # CloudinaryField to store the file
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def file_size(self):
         if self.file:
-            size = self.file.size
+            # Get the Cloudinary file resource metadata
+            file_info = resource(self.file.public_id)
+            size = file_info.get('bytes', 0)  # 'bytes' contains the file size in bytes
+
+            # Convert the file size to a readable format
             for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:
                 if size < 1024:
                     return f"{size:.2f} {unit}"

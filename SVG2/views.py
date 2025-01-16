@@ -37,6 +37,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator
 from decimal import Decimal
 import logging
+from cloudinary.api import resource
 
 
 
@@ -3071,11 +3072,20 @@ def upload_financial_file(request, username):
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def dl_file(request, username, file_id):
+    # Get the financial file object
     financial_file = get_object_or_404(FinancialFile, id=file_id)
-    response = HttpResponse(financial_file.file, content_type='application/octet-stream')
-    response['Content-Disposition'] = f'attachment; filename="{financial_file.file.name.split("/")[-1]}"'
-    return response
 
+    # Get the Cloudinary file URL
+    file_url = financial_file.file.url  # Cloudinary URL for the file
+
+    # Download the file content from Cloudinary
+    file_content = requests.get(file_url).content
+
+    # Create a response to serve the file with the correct MIME type
+    response = HttpResponse(file_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{financial_file.file.public_id.split("/")[-1]}"'
+    return response
+    
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def delete_file(request, username, file_id):
