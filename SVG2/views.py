@@ -489,6 +489,18 @@ def add_household(request, username):
             household.owner_name = request.user
             household.save()
             
+            # Fetch existing billing months
+            existing_billing_months = Billing.objects.values_list('billing_month', flat=True).distinct()
+
+            # Create billing entries for the new household
+            for billing_month in existing_billing_months:
+                Billing.objects.create(
+                    household=household,
+                    billing_month=billing_month,
+                    amount=300.00,  # Default amount; you can customize this
+                    status='Unpaid'  # Default status; you can customize this
+                )
+
             messages.success(request, "Household added successfully!", extra_tags="household_update")
             
             # Create a notification for all officers
