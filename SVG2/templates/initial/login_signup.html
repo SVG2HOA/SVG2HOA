@@ -714,8 +714,20 @@ form.sign-in-form {
                 >
                     <i class="fas fa-eye-slash"></i>
                 </button>
+                <div id="password-requirements" style="display: none; position: absolute; top: 100%; left: 0; background: #fff; color: #333; border: 1px solid #ccc; border-radius: 5px; padding: 10px; width: 100%; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 10; font-size: 14px;">
+                  <ul style="margin: 0; padding: 0; list-style: none;">
+                      <li>- At least 8 characters</li>
+                      <li>- Cannot be too similar to your personal information</li>
+                      <li>- Must not be a common password</li>
+                      <li>- Cannot be entirely numeric</li>
+                  </ul>
+                  <p style="margin-top: 10px;">Example: <b>P@ssw0rd123</b></p>
+              </div>
             </div>
             
+<script>
+
+</script>
             <div class="input-field" style="position: relative;">
                 <i class="fas fa-lock" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);"></i>
                 {{ signup_form.password2|add_class:"password-input" }}
@@ -727,7 +739,10 @@ form.sign-in-form {
                     <i class="fas fa-eye-slash"></i>
                 </button>
             </div>
-              
+              <!-- Password Match Feedback -->
+<div id="password-match-feedback" style="color:white; font-size: 14px; display: none; background-color: rgb(196, 2, 2); padding: 10px;">
+  <p>Passwords do not match</p>
+</div>
             <div class="input-field user-type relative flex items-center bg-gray-200 rounded-full px-4 py-2">
               <i class="fas fa-users mr-2 text-gray-600"></i>
               {{ signup_form.user_type }}
@@ -778,67 +793,107 @@ form.sign-in-form {
       </div>
     </div>
 
-    <script>
+    <script>document.addEventListener("DOMContentLoaded", () => {
       const sign_in_btn = document.querySelector("#sign-in-btn");
       const sign_up_btn = document.querySelector("#sign-up-btn");
       const container = document.querySelector(".container");
     
       // Toggle between sign-in and sign-up modes
-      sign_up_btn.addEventListener("click", () => {
-        container.classList.add("sign-up-mode");
-      });
+      if (sign_up_btn && sign_in_btn && container) {
+        sign_up_btn.addEventListener("click", () => {
+          container.classList.add("sign-up-mode");
+        });
     
-      sign_in_btn.addEventListener("click", () => {
-        container.classList.remove("sign-up-mode");
-      });
+        sign_in_btn.addEventListener("click", () => {
+          container.classList.remove("sign-up-mode");
+        });
+      }
     
-      document.addEventListener("DOMContentLoaded", () => {
-        // Sign-Up form password toggle buttons
-        const password1Input = document.querySelector("input[name='password1']");
-        const password2Input = document.querySelector("input[name='password2']");
-        const togglePassword1Button = document.getElementById("togglePassword1");
-        const togglePassword2Button = document.getElementById("togglePassword2");
+      const password1Input = document.querySelector("input[name='password1']");
+  const password2Input = document.querySelector("input[name='password2']");
+  const passwordMatchFeedback = document.getElementById("password-match-feedback");
+
+  // Function to compare passwords
+  function checkPasswordMatch() {
+    if (password1Input && password2Input && passwordMatchFeedback) {
+      if (password1Input.value !== password2Input.value) {
+        passwordMatchFeedback.style.display = "block";  // Show feedback
+      } else {
+        passwordMatchFeedback.style.display = "none";   // Hide feedback
+      }
+    }
+  }
+
+  // Event listeners for password inputs
+  if (password1Input && password2Input) {
+    password1Input.addEventListener("input", checkPasswordMatch);  // Trigger on input change in password1
+    password2Input.addEventListener("input", checkPasswordMatch);  // Trigger on input change in password2
+  }
+
+  // Password toggle functionality (already in place)
+  const togglePassword1Button = document.getElementById("togglePassword1");
+  const togglePassword2Button = document.getElementById("togglePassword2");
+
+  if (togglePassword1Button && password1Input) {
+    togglePassword1Button.addEventListener("click", () => {
+      const isPassword = password1Input.getAttribute("type") === "password";
+      password1Input.setAttribute("type", isPassword ? "text" : "password");
+      togglePassword1Button.innerHTML = isPassword
+        ? '<i class="fas fa-eye"></i>'
+        : '<i class="fas fa-eye-slash"></i>';
+    });
+  }
+
+  if (togglePassword2Button && password2Input) {
+    togglePassword2Button.addEventListener("click", () => {
+      const isPassword = password2Input.getAttribute("type") === "password";
+      password2Input.setAttribute("type", isPassword ? "text" : "password");
+      togglePassword2Button.innerHTML = isPassword
+        ? '<i class="fas fa-eye"></i>'
+        : '<i class="fas fa-eye-slash"></i>';
+    });
+  }
     
-        if (togglePassword1Button && password1Input) {
-          togglePassword1Button.addEventListener("click", () => {
-            const isPassword = password1Input.getAttribute("type") === "password";
-            password1Input.setAttribute("type", isPassword ? "text" : "password");
-            togglePassword1Button.innerHTML = isPassword
-              ? '<i class="fas fa-eye"></i>'
-              : '<i class="fas fa-eye-slash"></i>';
-          });
-        }
+      // Login password toggle button
+      const loginPasswordInput = document.querySelector("input[name='password']");
+      const togglePasswordButton = document.getElementById("togglePassword");
     
-        if (togglePassword2Button && password2Input) {
-          togglePassword2Button.addEventListener("click", () => {
-            const isPassword = password2Input.getAttribute("type") === "password";
-            password2Input.setAttribute("type", isPassword ? "text" : "password");
-            togglePassword2Button.innerHTML = isPassword
+      if (togglePasswordButton && loginPasswordInput) {
+        togglePasswordButton.addEventListener("click", () => {
+          const isPassword = loginPasswordInput.getAttribute("type") === "password";
+          loginPasswordInput.setAttribute("type", isPassword ? "text" : "password");
+          togglePasswordButton.innerHTML = isPassword
             ? '<i class="fas fa-eye"></i>'
             : '<i class="fas fa-eye-slash"></i>';
-          });
-        }
+        });
+      }
     
-        // Sign-In form password toggle button
-        const loginPasswordInput = document.querySelector("input[name='password']");
-        const togglePasswordButton = document.getElementById("togglePassword");
+      // Modal for terms and conditions
+      window.openModal = function () {
+        const termsModal = document.getElementById("termsModal");
+        if (termsModal) termsModal.style.display = "block";
+      };
     
-        if (togglePasswordButton && loginPasswordInput) {
-          togglePasswordButton.addEventListener("click", () => {
-            const isPassword = loginPasswordInput.getAttribute("type") === "password";
-            loginPasswordInput.setAttribute("type", isPassword ? "text" : "password");
-            togglePasswordButton.innerHTML = isPassword
-            ? '<i class="fas fa-eye"></i>'
-            : '<i class="fas fa-eye-slash"></i>';
-          });
-        }
-      });
-  function openModal() {
-    document.getElementById('termsModal').style.display = 'block';
-  }
-  function closeModal() {
-    document.getElementById('termsModal').style.display = 'none';
-  }
+      window.closeModal = function () {
+        const termsModal = document.getElementById("termsModal");
+        if (termsModal) termsModal.style.display = "none";
+      };
+    
+      // Password requirements tooltip
+      const passwordInput = document.querySelector("input[name='password1']");
+      const passwordRequirements = document.getElementById("password-requirements");
+    
+      if (passwordInput && passwordRequirements) {
+        passwordInput.addEventListener("focus", () => {
+          passwordRequirements.style.display = "block";
+        });
+    
+        passwordInput.addEventListener("blur", () => {
+          passwordRequirements.style.display = "none";
+        });
+      }
+    });
+    
     </script>
     
     <script src="{% static 'js/bundle.js' %}"></script>

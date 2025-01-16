@@ -1417,6 +1417,10 @@ select {
   list-style-type: none;
 }
 
+.list-disc {
+  list-style-type: disc;
+}
+
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
@@ -1847,6 +1851,11 @@ select {
   background-color: rgb(252 165 165 / var(--tw-bg-opacity, 1));
 }
 
+.bg-gray-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 65 81 / var(--tw-bg-opacity, 1));
+}
+
 .bg-opacity-15 {
   --tw-bg-opacity: 0.15;
 }
@@ -2056,6 +2065,10 @@ select {
 
 .pt-6 {
   padding-top: 1.5rem;
+}
+
+.pl-4 {
+  padding-left: 1rem;
 }
 
 .text-left {
