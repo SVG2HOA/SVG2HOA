@@ -90,13 +90,61 @@ New Appointment
               </div>
             </div>
 
+             <!-- New Purpose Field -->
+
+             <div id="certification_for" class="sm:col-span-2">
+              <label for="certification_for" class="block text-sm font-medium leading-6 text-gray-900">Certification For</label>
+              <div class="mt-2">
+                <input type="text" name="certification_for"
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+              </div>
+            </div>
+            
+            <div id="postal_address" class="sm:col-span-4">
+              <label for="postal_address" class="block text-sm font-medium leading-6 text-gray-900">Postal Address</label>
+              <div class="mt-2">
+                <input type="text" name="postal_address"
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+              </div>
+            </div>
+            
+            <div id="requested_by" class="sm:col-span-2">
+              <label for="requested_by" class="block text-sm font-medium leading-6 text-gray-900">Requested By</label>
+              <div class="mt-2">
+                <input type="text" name="requested_by"
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+              </div>
+            </div>
+
+            
+      <div id="purpose" class="sm:col-span-2">
+        <label for="purpose" class="block text-sm font-medium leading-6 text-gray-900">Purpose</label>
+        <div class="mt-2">
+          <select name="purpose"
+            class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
+            {% for value, display_text in form.fields.purpose.choices %}
+            <option value="{{ value }}" {% if form.instance.purpose == value %} selected {% endif %}>{{ display_text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Other Purpose Input -->
+      <div id="other_purpose_field" class="sm:col-span-2">
+        <label for="other_purpose_field" class="block text-sm font-medium leading-6 text-gray-900">Specify here if other purpose:</label>
+        <div class="mt-2">
+          <input type="text" name="other_purpose_field"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+      </div>
+
             <div class="col-span-full">
               <label for="description" class="block text-sm font-medium leading-6 text-gray-900">Brief Situation</label>
               <div class="mt-2">
                 <textarea id="description" name="description" rows="3"
                   class="block w-full p-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"></textarea>
               </div>
-              <p class="mt-3 text-sm leading-6 text-gray-600">Write your description here.</p>
+              <p class="mt-3 text-sm leading-6 text-gray-600">Write the description of your appointment here.</p>
             </div>
 
             <div class="col-span-full">
@@ -137,4 +185,37 @@ New Appointment
 </div>
 </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const appointmentTypeField = document.getElementById("appointment_type");
+    const certificationFields = [
+      document.getElementById("certification_for"),
+      document.getElementById("postal_address"),
+      document.getElementById("requested_by"),
+      document.getElementById("purpose"),
+      document.getElementById("other_purpose_field"),
+    ];
+
+    function toggleCertificationFields() {
+      const isCertification = appointmentTypeField.value === "Certification"; // Adjust the value if necessary
+      certificationFields.forEach(field => {
+        if (field) {
+          field.closest("div").style.display = isCertification ? "block" : "none";
+          if (isCertification) {
+            field.required = true; // Make the field required
+          } else {
+            field.required = false; // Remove required attribute
+          }
+        }
+      });
+    }
+
+    // Initial toggle based on the default selection
+    toggleCertificationFields();
+
+    // Listen for changes in the appointment type field
+    appointmentTypeField.addEventListener("change", toggleCertificationFields);
+  });
+
+</script>
 {% endblock %}

@@ -71,8 +71,10 @@ News
         </div>
     </div>
     {% endif %}
-    {% if latest_news %}
-    <div class=" md:col-span-2 lg:col-span-1 flex flex-wrap items-center">
+    {% if latest_news and latest_announcement %}
+		<div class=" md:col-span-2 lg:col-span-1 flex flex-wrap items-center">
+			{% elif latest_news %}
+    <div class=" md:col-span-2 lg:col-span-2 flex flex-wrap items-center">
         <h2 class="animate_top text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 text-center p-2">
             | News
         </h2>
@@ -126,4 +128,32 @@ News
 {% endfor %}
 
 </div>
+{% if newsfeeds %}
+<div class="pagination flex justify-center items-center mt-4">
+    <nav class="flex items-center justify-center text-gray-700">
+        <!-- Placeholder for alignment -->
+        <div class="text-center flex">
+            {% if page_obj_newsfeeds.has_previous %}
+            <a href="?page_newsfeeds=1" class="px-3 py-2 text-2xl font-bold rounded hover:bg-gray-200"> &laquo; </a>
+            <a href="?page_newsfeeds={{ page_obj_newsfeeds.previous_page_number }}"
+                class="px-3 py-2 text-2xl font-bold rounded hover:bg-gray-200">&#8249;</a>
+            {% endif %}
+        </div>
+        <p class="px-3 py-2 font-medium rounded">{{ page_obj_newsfeeds.number }} / {{ page_obj_newsfeeds.paginator.num_pages }}</p>
+        <!-- Placeholder for alignment -->
+        <div class="text-center flex">
+            {% if page_obj_newsfeeds.has_next %}
+            <a href="?page_newsfeeds={{ page_obj_newsfeeds.next_page_number }}"
+                class="px-3 py-2 text-2xl font-bold rounded hover:bg-gray-200">
+                &#8250;
+            </a>
+            <a href="?page_newsfeeds={{ page_obj_newsfeeds.paginator.num_pages }}"
+                class="px-3 py-2 text-2xl font-bold rounded hover:bg-gray-200">
+                &raquo;
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+</div>
+{% endif %}
 {% endblock %}

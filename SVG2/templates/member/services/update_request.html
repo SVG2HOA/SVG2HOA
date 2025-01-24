@@ -59,7 +59,7 @@ Update Request
       {% csrf_token %}
         <div class="border-b border-gray-900/10 pb-12">
           <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div class="sm:col-span-3">
+            <div class="sm:col-span-2">
               <label for="service_type" class="block text-sm font-medium leading-6 text-gray-900">Service Type</label>
               <div class="mt-2">
                 <select id="service_type" name="service_type" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
@@ -70,14 +70,24 @@ Update Request
               </div>
             </div>
 
-            <div class="sm:col-span-3">
+            <div class="sm:col-span-2">
               <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Subject</label>
               <div class="mt-2">
                 <input type="text" name="title" id="title" {% if service_request.id %} value="{{ form.title.value }}" {% else %} value="" {% endif %}
                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
               </div>
             </div>
-
+            
+            <div class="sm:col-span-2">
+              <label for="street" class="block text-sm font-medium leading-6 text-gray-900">Street</label>
+              <div class="mt-2">
+                  <select id="street" name="street" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" required>
+                      {% for value, display_text in street_choices %}
+                      <option value="{{ value }}">{{ display_text }}</option>
+                  {% endfor %}
+                  </select>
+              </div>
+          </div>
 
             <div class="col-span-full">
               <label for="description" class="block text-sm font-medium leading-6 text-gray-900">Description</label>
@@ -85,7 +95,7 @@ Update Request
                 <textarea id="description" name="description" rows="3"
                   class="block w-full p-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6">{% if service_request.id %}{{ form.description.value }}{% endif %} </textarea>
               </div>
-              <p class="text-sm leading-6 text-gray-600">Write your description here.</p>
+              <p class="text-sm leading-6 text-gray-600">Please specify the details of the request here.</p>
             </div>
 
             <div class="col-span-full">

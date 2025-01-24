@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from .views import LoginSignupView, member_landing_page, officer_landing_page, edit_household, add_household, add_resident, resident_detail, edit_resident, logout_view, make_reservation, ReservationListView, update_reservation_status, cancel_reservation, cancel_request, ViewAppointment, update_appointment_status
 from .views import HouseholdListView, ViewUserInfo, EditUserInfo, ResidentListView, HouseholdDetailView, HouseholdDetailsView, EditHousehold, submit_request, update_request, edit_billing_status, EditResident, ViewResidentInfo, newsfeed, news_feed, add_news, edit_news, RequestListView, update_request_status, AppointmentListView, calendar
 from .views import subscribe_newsletter, events_calendar, eventscalendar, news_article, officer_profile_info, officer_update_profile, about, member_profile_info, member_update_profile, communitymap, MyReservation, MyRequest, ViewRequest, MyAppointment, make_appointment, cancel_appointment, update_appointment, update_reservation
-from .views import OfficerNotificationsView, MemberNotificationsView, create_payment_link, send_activation_email
+from .views import OfficerNotificationsView, MemberNotificationsView, create_payment_link, send_activation_email, add_edit_term, delete_term, add_edit_hotline, delete_hotline, terms_and_hotline
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -121,9 +121,16 @@ urlpatterns = [
     path('officer/<username>/financial-statements/', views.upload_financial_file, name='upload_financial_file'),
     path('officer/<username>/financial-statements/download/<int:file_id>/', views.dl_file, name='dl_file'),
     path('officer/<username>/financial-statements/delete/<int:file_id>/', views.delete_file, name='delete_file'),
+    #officer terms and hotlines
+    path('officer/<username>/terms-and-hotlines/', terms_and_hotline, name='terms_and_hotline'),
+    path('officer/<username>/terms-and-hotlines/add-term/', add_edit_term, name='add_term'),
+    path('officer/<username>/terms-and-hotlines/edit-term/<int:term_id>/', add_edit_term, name='edit_term'),
+    path('officer/<username>/terms-and-hotlines/delete-term/<int:term_id>/', delete_term, name='delete_term'),
+    path('officer/<username>/terms-and-hotlines/add-hotline/', add_edit_hotline, name='add_hotline'),
+    path('officer/<username>/terms-and-hotlines/edit-hotline/<int:hotline_id>/', add_edit_hotline, name='edit_hotline'),
+    path('officer/<username>/terms-and-hotlines/delete-hotline/<int:hotline_id>/', delete_hotline, name='delete_hotline'),
 
     path("<username>/household/billing/<int:billing_id>/", create_payment_link, name="create_payment_link"),
-
 ]
 
 if settings.DEBUG:

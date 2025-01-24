@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Note, Notification, FinancialFile
+from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Note, Notification, FinancialFile, Term, EmergencyHotline
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from datetime import datetime, date, time
@@ -87,10 +87,14 @@ class UserSignUpForm(UserCreationForm):
         choices=[('member', 'Member'), ('officer', 'Officer')],
         widget=forms.Select(attrs={"class": "form-control", "placeholder": "User Type"})
     )
-
+    proof_of_membership = forms.ImageField(
+        required=True,
+        widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+        label="Proof of Membership"
+    )
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'user_type']
+        fields = ['username', 'email', 'password1', 'password2', 'user_type', 'proof_of_membership']
 
     
     def clean(self):
@@ -104,6 +108,12 @@ class UserSignUpForm(UserCreationForm):
         email = cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
             raise ValidationError("This email is already in use.")
+        
+    def clean_proof_of_membership(self):
+        proof = self.cleaned_data.get('proof_of_membership')
+        if proof and proof.size > 5 * 1024 * 1024:  # 5MB limit
+            raise ValidationError("The uploaded file is too large (max size is 5MB).")
+        return proof
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -117,6 +127,10 @@ class UserSignUpForm(UserCreationForm):
             user.is_officer = True
 
         user.is_active = False  # Default inactive for all new users
+
+        if self.cleaned_data.get('proof_of_membership'):
+            user.proof_of_membership = self.cleaned_data['proof_of_membership']
+
         if commit:
             user.save()
 
@@ -131,7 +145,7 @@ class UserSignUpForm(UserCreationForm):
 class MemberChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['fname', 'lname', 'username', 'email', 'profile_picture', 'phone_number', 'birthdate']
+        fields = ['fname', 'lname', 'username', 'email', 'profile_picture', 'phone_number', 'birthdate', 'proof_of_membership']
     
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -148,7 +162,7 @@ class OfficerChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['profile_picture', 'fname', 'lname', 'username', 'email', 'phone_number', 'birthdate', 'officer_position']
+        fields = ['profile_picture', 'fname', 'lname', 'username', 'email', 'phone_number', 'birthdate', 'officer_position', 'proof_of_membership']
 
     def __init__(self, *args, **kwargs):
         user_instance = kwargs.pop('instance', None)
@@ -187,20 +201,44 @@ class HouseholdForm(forms.ModelForm):
         ('Van', 'Van'),
     )
 
-    vehicles_owned = forms.MultipleChoiceField(choices=VEHICLE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-
-    class Meta:
-        model = Household
-        fields = ['block', 'lot', 'street', 'home_tenure', 'land_tenure', 'construction', 'kitchen', 'vehicles_owned', 'water_facility', 'toilet_facility']
-
+    # Dynamically generate fields for vehicle types and quantities
     def __init__(self, *args, **kwargs):
         super(HouseholdForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.vehicles_owned:
-            self.fields['vehicles_owned'].initial = self.instance.vehicles_owned.split(', ')
+            # Populate initial values for each vehicle type
+            for vehicle, quantity in self.instance.vehicles_owned.items():
+                self.fields[f'vehicle_{vehicle}'] = forms.IntegerField(
+                    label=f'{vehicle} Quantity',
+                    initial=quantity,
+                    required=False,
+                    min_value=0
+                )
+        else:
+            # Create fields for all vehicle types with default initial value
+            for vehicle, _ in self.VEHICLE_CHOICES:
+                self.fields[f'vehicle_{vehicle}'] = forms.IntegerField(
+                    label=f'{vehicle} Quantity',
+                    initial=0,
+                    required=False,
+                    min_value=0
+                )
+
+    class Meta:
+        model = Household
+        fields = ['block', 'lot', 'street', 'home_tenure', 'land_tenure', 'construction', 'kitchen', 'water_facility', 'toilet_facility']
 
     def save(self, commit=True):
         instance = super(HouseholdForm, self).save(commit=False)
-        instance.vehicles_owned = ', '.join(self.cleaned_data['vehicles_owned'])
+
+        # Collect vehicle data into a dictionary
+        vehicles_data = {}
+        for vehicle, _ in self.VEHICLE_CHOICES:
+            quantity = self.cleaned_data.get(f'vehicle_{vehicle}', 0) or 0  # Ensure quantity is an integer
+            if quantity > 0:  # Only save vehicles with quantity > 0
+                vehicles_data[vehicle] = quantity
+
+        instance.vehicles_owned = vehicles_data
+
         if commit:
             instance.save()
         return instance
@@ -247,7 +285,7 @@ class ReservationStatusForm(forms.ModelForm):
 class ServiceRequestForm(forms.ModelForm):
     class Meta:
         model = ServiceRequest
-        fields = ['service_type', 'title', 'description', 'image']
+        fields = ['service_type', 'title', 'street', 'description', 'image']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
@@ -274,13 +312,39 @@ class AnnouncementForm(forms.ModelForm):
         fields = ['who', 'what', 'date', 'time', 'where', 'image']
 
 class GrievanceForm(forms.ModelForm):
+    certification_for = forms.CharField(required=False)
+    postal_address = forms.CharField(required=False)
+    requested_by = forms.CharField(required=False)
+    other_purpose = forms.CharField(required=False, help_text="Specify if 'Other' is selected for purpose.")
+
     class Meta:
         model = GrievanceAppointment
-        fields = ['appointment_type', 'subject', 'reservation_date', 'description', 'image']
+        fields = ['appointment_type', 'subject', 'reservation_date', 'description', 'image', 'certification_for', 'postal_address', 'requested_by', 'purpose', 'other_purpose']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        appointment_type = cleaned_data.get('appointment_type')
+        purpose = cleaned_data.get('purpose')
+        other_purpose = cleaned_data.get('other_purpose')
+
+        # Validate certification-specific fields
+        if appointment_type == 'Certification':
+            if not cleaned_data.get('certification_for'):
+                self.add_error('certification_for', 'This field is required for certifications.')
+            if not cleaned_data.get('postal_address'):
+                self.add_error('postal_address', 'This field is required for certifications.')
+            if not cleaned_data.get('requested_by'):
+                self.add_error('requested_by', 'This field is required for certifications.')
+
+            # Validate purpose
+            if purpose == 'Other' and not other_purpose:
+                self.add_error('other_purpose', 'Please specify the purpose if "Other" is selected.')
+
+        return cleaned_data
+        
     def clean_reservation_date(self):
         reservation_date = self.cleaned_data.get('reservation_date')
         if reservation_date and reservation_date.weekday() != 6:  # 6 represents Sunday
@@ -316,4 +380,22 @@ class FinancialFileForm(forms.ModelForm):
                 'placeholder': 'Enter file title'
             }),
             'file': forms.ClearableFileInput(attrs={'class': 'form-input block w-full'}),
+        }
+
+class TermForm(forms.ModelForm):
+    class Meta:
+        model = Term
+        fields = ['title', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-input w-full'}),
+            'description': forms.Textarea(attrs={'class': 'form-textarea w-full'}),
+        }
+
+class EmergencyHotlineForm(forms.ModelForm):
+    class Meta:
+        model = EmergencyHotline
+        fields = ['name', 'number']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-input w-full'}),
+            'number': forms.TextInput(attrs={'class': 'form-input w-full'}),
         }

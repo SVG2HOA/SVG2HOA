@@ -21,125 +21,74 @@ About
         <h2 class="animate_top text-xl sm:text-4xl font-bold text-gray-900 text-center">
           Executive Officers
         </h2>
-      <div class="flex flex-wrap justify-center gap-16 py-12">
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/president.jpg' %}" alt="President Arnel">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Arnel R. Dandoy</h4>
-                <p>President</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/vicepresident.jpg' %}" alt="Vice President Annabel">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Annabel T. Valentin</h4>
-                <p>Vice President</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/secretary.jpg' %}" alt="Secretary Meann">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Meann L. Ilagan</h4>
-                <p>Secretary</p>
-              </div>
-            </div>
-          </div>
-          </div>
-          
-      <div class="flex flex-wrap justify-center gap-16 pb-4">
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/treasurer.jpg' %}" alt="Treasurer Emily">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Emily G. Castillo</h4>
-                <p>Treasurer</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/auditor.jpg' %}" alt="Auditor Maria Corazon">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Ma. Corazon C. Almazan</h4>
-                <p>Auditor</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/pro.jpg' %}" alt="P.R.O. Julieta">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Julieta P. Ling</h4>
-                <p>P.R.O.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-            
+        <div class="flex flex-wrap justify-center px-24">
+          {% for officer in officers %}
+              {% if officer.officer_position in "President,Vice President,Secretary,Treasurer,Auditor,P.R.O." %}
+                  <div class="animate_top flex flex-col items-center p-8">
+                    <div class="relative w-64 h-64 overflow-hidden rounded-xl cursor-pointer transition duration-100 hover:scale-105" 
+                    onclick="showModal('{{ officer.user.fname }} {{ officer.user.lname }}', '{{ officer.officer_position }}', '{{ officer.user.profile_picture.url }}', '{{ officer.user.phone_number }}', '{{ officer.user.email }}')">
+                   <img class="w-full h-full object-cover bg-white" 
+                               src="{{ officer.user.profile_picture.url }}" 
+                               alt="{{ officer.officer_position }}">
+                          <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
+                              <h4 class="font-bold text-xl">{{ officer.user.fname }} {{ officer.user.lname }}</h4>
+                              <p>{{ officer.officer_position }}</p>
+                          </div>
+                      </div>
+                  </div>
+              {% endif %}
+          {% endfor %}
+      </div>
         <h2 class="animate_top text-xl sm:text-4xl font-bold text-gray-900 text-center pb-4">
           Board of Directors
         </h2>
-      <div class="flex flex-wrap justify-center gap-16 py-4">
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/business.jpg' %}" alt="Business & Finance Viviane">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Viviane M. Lim</h4>
-                <p>Business & Finance</p>
-              </div>
-            </div>
-          </div>
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/grievance.jpg' %}" alt="Grievance & Adjudication John">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">John Ferdinand B. Paulino</h4>
-                <p>Grievance & Adjudication</p>
-              </div>
-            </div>
-          </div>
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/peace.jpg' %}" alt="Peace & Order Isagani">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Isagani B. Cambay</h4>
-                <p>Peace & Order</p>
-              </div>
-            </div>
-          </div>
-          </div>
-      <div class="flex flex-wrap justify-center gap-16">
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/sports.jpg' %}" alt="Sports Committee Moises">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Moises Francisco Guatchin</h4>
-                <p>Sports Committee</p>
-              </div>
-            </div>
-          </div>
-          <div class="animate_top flex flex-col items-center">
-            <div class="relative w-64 h-64 overflow-hidden rounded-xl">
-                <img class="w-full h-full object-cover bg-white" src="{% static 'images/officers/def-user.png' %}" alt="Seniors Affair Demetrio">
-              <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
-                <h4 class="font-bold text-xl">Demetrio B. Antonio</h4>
-                <p>Seniors Affair</p>
-              </div>
-            </div>
-          </div>
+        <div class="flex flex-wrap justify-center px-24">
+          {% for officer in officers %}
+              {% if officer.officer_position not in "President,Vice President,Secretary,Treasurer,Auditor,P.R.O." %}
+              <div class="animate_top flex flex-col items-center p-8">
+                <div class="relative w-64 h-64 overflow-hidden rounded-xl cursor-pointer transition duration-100 hover:scale-105" 
+                onclick="showModal('{{ officer.user.fname }} {{ officer.user.lname }}', '{{ officer.officer_position }}', '{{ officer.user.profile_picture.url }}', '{{ officer.user.phone_number }}', '{{ officer.user.email }}')">
+               <img class="w-full h-full object-cover bg-white" 
+                               src="{{ officer.user.profile_picture.url }}" 
+                               alt="{{ officer.officer_position }}">
+                          <div class="absolute bottom-0 left-0 w-full bg-green-500 bg-opacity-80 text-white text-center py-2">
+                              <h4 class="font-bold text-xl">{{ officer.user.fname }} {{ officer.user.lname }}</h4>
+                              <p>{{ officer.officer_position }}</p>
+                          </div>
+                      </div>
+                  </div>
+              {% endif %}
+          {% endfor %}
       </div>
-    
-    
-    
+<!-- Modal -->
+<div id="officerModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/3 p-6 relative">
+      <button class="absolute top-2 right-3 text-gray-500 hover:text-gray-800" onclick="closeModal()">
+          ✕
+      </button>
+      <div class="flex flex-col items-center text-center">
+          <img id="modalImage" class="w-32 h-32 object-cover rounded-full mb-4" src="" alt="Officer">
+          <h3 id="modalName" class="text-xl font-bold text-green-600"></h3>
+          <p id="modalPosition" class="text-gray-600"></p>
+          <p id="modalPhone" class="text-gray-600"></p>
+          <p id="modalEmail" class="text-gray-600"></p>
+      </div>
+  </div>
+</div>
+<script>
+  function showModal(name, position, imageUrl, phone, email) {
+    document.getElementById("modalName").textContent = name;
+    document.getElementById("modalPosition").textContent = position;
+    document.getElementById("modalImage").src = imageUrl;
+    document.getElementById("modalPhone").textContent = `Phone: ${phone}`;
+    document.getElementById("modalEmail").textContent = `Email: ${email}`;
+    document.getElementById("officerModal").classList.remove("hidden");
+}
+
+function closeModal() {
+    document.getElementById("officerModal").classList.add("hidden");
+}
+</script>
   </section>
 
 <section id="contact" class="py-12">
@@ -333,70 +282,43 @@ About
     </script>
 </section>
 
-<section id="terms" class="py-12 px-12 text-gray-900">
-  <div class="flex flex-col items-center justify-center my-4 space-y-4 animate_top">
-    <h2 class="text-4xl sm:text-6xl font-bold text-gray-900 text-center">
-      Terms and Conditions
-    </h2>
-    <p class="text-lg text-gray-600 text-center">Read more about our terms and condition to understand the rules and guidelines for using our services.</p>
-</div>
-<div class="container mx-auto p-6 text-gray-800 animate_top">
-  <h2 class="text-2xl font-semibold mt-6">1. Eligibility</h2>
-  <p>You must be a registered member or officer of the HOA to access and use this system. Users must be at least 18 years old or have parental consent to use the services provided by the system.</p>
-
-  <h2 class="text-2xl font-semibold mt-6">2. Account Registration</h2>
-  <p>To use certain features of the system, you may need to create an account. You agree to provide accurate, complete, and up-to-date information during the registration process and to update such information as necessary. You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.</p>
-
-  <h2 class="text-2xl font-semibold mt-6">3. User Responsibilities</h2>
-  <p>You agree to use the system in compliance with all applicable laws and regulations. You must not:</p>
-
-      <p>  - Use the system for any unlawful or fraudulent activities.</p>
-      <p>  - Post, upload, or transmit any content that is harmful, abusive, or offensive.</p>
-      <p>  - Impersonate any individual or entity, or falsely represent your affiliation with any person or organization.</p>
-      <p>  -Interfere with or disrupt the functionality of the system.</p>
-
-      <h2 class="text-2xl font-semibold mt-6">4. Reservations, Appointments, and Requests</h2>
-      <p>  - By using the system to make reservations, appointments, or requests, you agree to comply with the terms and conditions set by the HOA, including:</p>
-      <p>  - Reservation requests are subject to availability and approval.</p>
-      <p>  - Appointments and requests may be subject to approval by relevant officers or administrators.</p>
-      <p>  - All cancellations and modifications must be made within the specified timeframes.</p>
-
-<h2 class="text-2xl font-semibold mt-6">5. Billing and Payments</h2>
-<p>If applicable, you agree to make timely payments for any services or amenities you reserve through the system. The HOA may charge fees for certain services, and failure to pay any outstanding fees may result in the suspension or termination of your access to certain system features.</p>
-
-<h2 class="text-2xl font-semibold mt-6">6. Notifications</h2>
-<p>You consent to receiving notifications through the system related to updates, reminders, announcements, and other communications related to your membership and activities within the HOA. Notifications may be sent by the HOA or other users, such as officers or members.</p>
-
-<h2 class="text-2xl font-semibold mt-6">7. Privacy and Data Security</h2>
-<p>The HOA values your privacy and is committed to protecting your personal information. By using this system, you agree to the collection, use, and storage of your personal data. The HOA will take reasonable measures to secure your data but cannot guarantee absolute security.</p>
-
-<h2 class="text-2xl font-semibold mt-6">8. Content Ownership and Usage</h2>
-<p>All content uploaded to the system, including but not limited to text, images, and other media, remains the property of the respective user or the HOA. By submitting content, you grant the HOA a license to use, display, and distribute the content within the system and for related purposes.</p>
-
-<h2 class="text-2xl font-semibold mt-6">9. Changes to Terms</h2>
-<p>The HOA reserves the right to modify these Terms and Conditions at any time. Any changes will be posted on this page, and the updated terms will be effective immediately upon posting. Your continued use of the system after such changes constitutes your acceptance of the new terms.</p>
-
-<h2 class="text-2xl font-semibold mt-6">10. Termination</h2>
-<p>The HOA reserves the right to suspend or terminate your access to the system if you violate these Terms and Conditions or engage in activities that are detrimental to the system or other users. You may also terminate your account by contacting the HOA.</p>
-
-<h2 class="text-2xl font-semibold mt-6">11. Limitation of Liability</h2>
-<p>The HOA is not liable for any direct, indirect, incidental, special, or consequential damages arising from your use or inability to use the system, including but not limited to any errors, omissions, or disruptions in service.</p>
-</div>
+  <section id="terms" class="py-12 px-12 text-gray-900">
+    <div class="flex flex-col items-center justify-center my-4 space-y-4 animate_top">
+      <h2 class="text-4xl sm:text-6xl font-bold text-gray-900 text-center">
+        Terms and Conditions
+      </h2>
+      <p class="text-lg text-gray-600 text-center">Read more about our terms and condition to understand the rules and guidelines for using our services.</p>
+  </div>
+  <div class="container mx-auto p-6 text-gray-800 animate_top">
+      {% for term in terms %}
+        <h2 class="text-2xl font-semibold mt-6">{{ forloop.counter }}. {{ term.title }}</h2>
+        <p>{{ term.description|safe }}</p>
+        {% empty %}
+    <div class="flex flex-col items-center justify-center my-4 space-y-4 animate_top h-96 sm:h-80 lg:h-96">
+      <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-400 text-center">
+          No terms and conditions.
+      </h2>
+  </div>
+      {% endfor %}
+  </div>
 </section>
 
-<section id="hotlines" class="py-12 px-12 text-gray-900">
-  <div class="flex flex-col items-center justify-center my-4 space-y-4 animate_top">
-    <h2 class="text-4xl sm:text-6xl font-bold text-gray-900 text-center">
-      Emergency Hotlines
-    </h2>
-</div>
-<div class="container mx-auto p-6 text-gray-800 animate_top">
-  <h2 class="text-2xl font-semibold mt-6">Barangay Molino 3   -  (046) 477-1959</h2>
-  <h2 class="text-2xl font-semibold mt-6">Barangay City Hall  -  (046) 434-4466</h2>
-  <h2 class="text-2xl font-semibold mt-6">Philippine National Police - (046) 416-7510</h2>
-  <h2 class="text-2xl font-semibold mt-6">Bacoor Fire Department     - (046) 417-6060</h2>
-  <h2 class="text-2xl font-semibold mt-6">Meralco Bacoor     - 1622-2227</h2>
-  <h2 class="text-2xl font-semibold mt-6">National Emergency Hotline -  911</h2>
-  <h2 class="text-2xl font-semibold mt-6">Bacoor Emergency Hotline   -  161</h2>
-</section>
-{% endblock content%}
+  <section id="hotlines" class="py-12 px-12 text-gray-900">
+    <div class="flex flex-col items-center justify-center my-4 space-y-4 animate_top">
+      <h2 class="text-4xl sm:text-6xl font-bold text-gray-900 text-center">
+        Emergency Hotlines
+      </h2>
+  </div>
+  <div class="container mx-auto p-6 text-gray-800 animate_top">
+    {% for hotline in hotlines %}
+      <h2 class="text-2xl font-semibold mt-6">{{ hotline.name }} - {{ hotline.number }}</h2>
+    {% empty %}
+    <div class="flex flex-col items-center justify-center my-4 space-y-4 animate_top h-96 sm:h-80 lg:h-96">
+      <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-400 text-center">
+          No hotlines.
+      </h2>
+  </div>
+    {% endfor %}
+  </div>
+  </section>
+{% endblock content %}

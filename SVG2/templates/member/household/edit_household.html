@@ -1,6 +1,7 @@
 {% extends "member/base.html" %}
 
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}
 Update Household
@@ -147,16 +148,24 @@ Update Household
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium leading-6 text-gray-900">Vehicles Owned</label>
-                        <div class="mt-2">
-                            {% for value, label in form.fields.vehicles_owned.choices %}
-                                <div>
-                                    <input type="checkbox" id="vehicle_{{ value }}" name="vehicles_owned" value="{{ value }}" {% if value in form.instance.vehicles_owned %} checked {% endif %}>
-                                    <label for="vehicle_{{ value }}" class="ml-2">{{ label }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
+                      <label class="block text-sm font-medium leading-6 text-gray-900">Vehicles Owned</label>
+                      <div class="mt-2">
+                          {% for vehicle, label in form.VEHICLE_CHOICES %}
+                              <div class="flex items-center mb-2">
+                                
+                                <input 
+                                type="number" 
+                                id="id_vehicle_{{ vehicle }}" 
+                                name="vehicle_{{ vehicle }}" 
+                                value="{{ vehicle|get_initial_value:form }}" 
+                                class="w-16 border-gray-500 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm mr-2"
+                                min="0">
+                                  <label for="id_vehicle_{{ vehicle }}" class=" text-gray-900" >{{ label }}</label>
+                              </div>
+                          {% endfor %}
+                      </div>
+                  </div>    
+                  
 
                       </div>
                 </div>

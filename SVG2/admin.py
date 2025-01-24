@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Notification, FinancialFile
+from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Notification, FinancialFile, Term, EmergencyHotline
 
 class UserAdmin(UserAdmin):
     model = User
-    list_display = ['pk', 'username', 'fname', 'lname', 'email', 'is_staff', 'is_member', 'is_officer', 'phone_number', 'profile_picture']
+    list_display = ['pk', 'username', 'fname', 'lname', 'email', 'is_staff', 'is_member', 'is_officer', 'phone_number', 'profile_picture', 'proof_of_membership']
+    readonly_fields = ('proof_of_membership',)
 
     fieldsets = UserAdmin.fieldsets + (
             (None, {'fields': ('is_member', 'is_officer')}),
@@ -49,7 +50,6 @@ class OfficerAdmin(admin.ModelAdmin):
     def profile_picture(self, obj):
         return obj.user.profile_picture
 
-
 @admin.register(Household)
 class HouseholdAdmin(admin.ModelAdmin):
     list_display = ['pk', 'owner_name', 'block', 'street']
@@ -67,8 +67,8 @@ class ReservationAdmin(admin.ModelAdmin):
 
 @admin.register(ServiceRequest)
 class ServiceRequestAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'household', 'service_type', 'created_at', 'updated_at', 'status', 'image']
-    ordering = ['pk', 'household', 'service_type', 'created_at', 'updated_at', 'status']
+    list_display = ['pk', 'household', 'service_type', 'street', 'created_at', 'updated_at', 'status', 'image']
+    ordering = ['pk', 'household', 'street', 'service_type', 'created_at', 'updated_at', 'status']
 
 @admin.register(GrievanceAppointment)
 class GrievanceAppointmentAdmin(admin.ModelAdmin):
@@ -94,6 +94,14 @@ class FinancialFileAdmin(admin.ModelAdmin):
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ('who', 'what', 'date', 'time', 'where', 'image')
+
+@admin.register(Term)
+class TermAdmin(admin.ModelAdmin):
+    list_display = ('title',)
+
+@admin.register(EmergencyHotline)
+class EmergencyHotlineAdmin(admin.ModelAdmin):
+    list_display = ('name', 'number')
 
 admin.site.register(User, UserAdmin)
 admin.site.register(NewsletterSubscriber)

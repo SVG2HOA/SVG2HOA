@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1in;
+        }
+
+        .header img {
+            width: 1in;
+            height: 1in;
+        }
+
+        .header h2, .header h3 {
+            margin: 0;
+        }
+
+        .details {
+            margin-bottom: 20px;
+        }
+
+        .details .number-date {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .body-text {
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .table {
+            margin: 20px 0;
+        }
+
+        .table p {
+            margin: 5px 0;
+        }
+
+        .signature {
+            text-align: right;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://res.cloudinary.com/dir68lm7d/image/upload/v1737731364/Gardens_2_Logo_lt19gw.png" alt="Gardens 2 Logo">
+        <h2>CAMELLA HOMES SPRINGVILLE GARDENS 2</h2>
+        <h2>HOMEOWNERS ASSOCIATION, INC.</h2>
+        <h3>Molino 3, Bacoor City, Cavite</h3>
+    </div>
+
+    <h2 style="text-align: center;">CERTIFICATION</h2>
+
+    <div class="details">
+        <div class="number-date">
+            <p>No. 2025 - _____</p>
+            <p>Date: {{ grievance_appointment.created_at|date:"F j, Y" }}</p>
+        </div>
+    </div>
+
+    <div class="body-text">
+        <p>TO WHOM IT MAY CONCERN:</p>
+        <p>
+            This is to certify that Mr. / Ms. <b>{{ grievance_appointment.certification_details.certification_for }}</b>
+            with postal address at <b>{{ grievance_appointment.certification_details.postal_address }}</b>
+            is a bona fide homeowner/resident and a member of good standing.
+            This certification is issued upon the request of Mr. / Ms. <b>{{ grievance_appointment.certification_details.requested_by }}</b>.
+        </p>
+    </div>
+
+    <div class="table">
+        <p>For the purpose of: <b>{{ grievance_appointment.certification_details.purpose }}</b></p>
+        {% if grievance_appointment.certification_details.purpose == 'Other' %}
+        <p>Other Purpose: {{ grievance_appointment.certification_details.other_purpose }}</p>
+        {% endif %}
+    </div>
+    
+
+    <div class="signature">
+        <p>Arnel R. Dandoy<br>
+        President<br>
+        CSVG2HOAI</p>
+    </div>
+</body>
+</html>

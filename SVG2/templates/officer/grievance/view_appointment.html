@@ -62,11 +62,33 @@ Appointment: {{ grievanceappointment.appointment_type }}
                       No image attached</dd>
                       {% endif %}
                       </div>
+                      
+                      {% if grievanceappointment.appointment_type == "Certification" %}
+    <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+        <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1">Certification PDF</dt>
+        <dd class="text-sm leading-6 text-gray-700 col-span-2 mt-0">
+            {% if grievanceappointment.certification_pdf_url %}
+                <!-- Display PDF preview using Google Docs Viewer -->
+                <iframe src="https://docs.google.com/gview?url={{ grievanceappointment.certification_pdf_url }}&embedded=true" style="width:100%; height:500px;" frameborder="0"></iframe>
+            {% else %}
+                No PDF available
+            {% endif %}
+        </dd>
+    </div>
+{% endif %}
+
                     </dl>
                     </div>
 
-              <div class="mt-6 flex items-center justify-start gap-x-6">
+              <div class="my-6 flex items-center justify-start gap-x-6">
                 <a href="{% url 'update_appointment_status' user.username grievanceappointment.id %}"><span class="rounded-md bg-green-700 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Update</span></a>
+                {% if grievanceappointment.appointment_type == "Certification" %}
+                {% if grievanceappointment.certification_pdf_url %}
+                <a href="{{ grievanceappointment.certification_pdf_url }}" download="certification_{{ grievanceappointment.id }}.pdf">
+                  <span class="rounded-md bg-blue-700 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    Download PDF</span></a>
+                    {% endif %}
+                    {% endif %}
               </div>
             </div>
           

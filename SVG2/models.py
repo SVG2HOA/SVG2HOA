@@ -32,7 +32,7 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # Optional field for phone number
     birthdate = models.DateField(null=True, blank=True)  # Optional field for birthdate
     email = models.EmailField(unique=True)
-    
+    proof_of_membership =  CloudinaryField('membership_proof')
 
     class Meta:
         app_label = 'SVG2'
@@ -136,7 +136,7 @@ class Household(models.Model):
     home_tenure = models.CharField(max_length=10, choices=HOME_TENURE_CHOICES)
     land_tenure = models.CharField(max_length=10, choices=LAND_TENURE_CHOICES)
     construction = models.CharField(max_length=13, choices=CONSTRUCTION_CHOICES)
-    vehicles_owned = models.TextField(blank=True, null=True)
+    vehicles_owned = models.JSONField(blank=True, null=True)
     kitchen = models.CharField(max_length=10, choices=KITCHEN_CHOICES)
     water_facility = models.CharField(max_length=10, choices=WATER_FACILITY_CHOICES)
     toilet_facility = models.CharField(max_length=19, choices=TOILET_FACILITY_CHOICES)
@@ -145,6 +145,10 @@ class Household(models.Model):
     def number_of_residents(self):
         # Ensure there's always at least 1 (the owner) counted as a resident
         return max(0, self.residents.count())
+    
+    def total_vehicles(self):
+        """Calculate the total number of vehicles."""
+        return sum(self.vehicles_owned.values())
 
     def __str__(self):
          return f"{self.owner_name.fname} {self.owner_name.lname}"
@@ -252,10 +256,21 @@ class ServiceRequest(models.Model):
         ('Completed', 'Completed'),
         ('Canceled', 'Canceled'),
     )
-
+    STREET_CHOICES = (
+        ('Bellflower', 'Bellflower'),
+        ('Carnation', 'Carnation'),
+        ('Dahlia', 'Dahlia'),
+        ('Daisy', 'Daisy'),
+        ('Gardenia', 'Gardenia'),
+        ('Hyacinth', 'Hyacinth'),
+        ('Petunia', 'Petunia'),
+        ('Poinsettia', 'Poinsettia'),
+        ('Primrose', 'Primrose'),
+    )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     service_type = models.CharField(max_length=20, choices=SERVICE_CHOICES, default='Maintenance Request')
+    street = models.CharField(max_length=10, choices=STREET_CHOICES)
     image = CloudinaryField('service_requests', blank=True, null=True)
     household = models.ForeignKey(Household, on_delete=models.CASCADE, related_name='service_requests')
     status = models.CharField(max_length=20, choices=REQUEST_STATUS_CHOICES, default='Submitted')
@@ -313,6 +328,16 @@ class GrievanceAppointment(models.Model):
         ('Grievance', 'Grievance'),
         ('Others', 'Others'),
     )
+    PURPOSE_CHOICES = (
+        ('Homeowners Certificate', 'Homeowners Certificate'),
+        ('Move In / Move Out', 'Move In / Move Out'),
+        ('Gate Pass', 'Gate Pass'),
+        ('Business Permit (New/Renewal)', 'Business Permit (New/Renewal)'),
+        ('Building Permit (Renovation/Extension/Fence)', 'Building Permit (Renovation/Extension/Fence)'),
+        ('Employment/Loan/School/Police Clearance/ID', 'Employment/Loan/School/Police Clearance/ID'),
+        ('Car Sticker', 'Car Sticker'),
+        ('Other', 'Other Purpose (Specify)'),
+    )
     household = models.ForeignKey(Household, on_delete=models.CASCADE, related_name='grievance_appointments')
     appointment_type = models.CharField(max_length=20, choices=APPOINTMENT_CHOICES, default='Certification')
     subject = models.CharField(max_length=255)
@@ -330,7 +355,10 @@ class GrievanceAppointment(models.Model):
     )
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Pending')
     status_changed_by_officer = models.BooleanField(default=False)
-    
+    certification_details = models.JSONField(blank=True, null=True)  # To store the additional fields for certification
+    purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES, blank=True, null=True)
+    certification_pdf_url = models.URLField(blank=True, null=True)
+
     def __str__(self):
         return f"{self.household} - {self.reservation_date}"
 
@@ -381,3 +409,17 @@ class FinancialFile(models.Model):
 
     def __str__(self):
         return self.title
+
+class Term(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.title
+
+class EmergencyHotline(models.Model):
+    name = models.CharField(max_length=255)
+    number = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.name} - {self.number}"

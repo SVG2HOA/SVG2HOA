@@ -19,7 +19,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         h1 {
-            color: #4CAF50;
+            color: #0e6c11;
             font-size: 24px;
             margin-bottom: 20px;
         }
@@ -49,11 +49,15 @@
 </head>
 <body>
     <div class="email-container">
-        <h1>Welcome to Springville Gardens 2</h1>
-        <p>Hello {{ user.username }},</p>
-        <p>Thank you for registering with our HOA Management. Please click the link below to activate your account:</p>
-        <p><a href="{{ activation_link }}" class="button" style="color: #f4f4f4;">Activate Your Account</a></p>
-        <p>If you did not register, please ignore this email.</p>
+        <h1>Springville Gardens 2</h1>
+        <p>New user registration: {{ user.username }} ({{ user.email }}),</p>
+        {% if proof_of_membership_url %}
+        <p>Proof of Membership:</p>
+        <p><a href="{{ proof_of_membership_url }}" target="_blank">View Uploaded Proof of Membership</a></p>
+        {% endif %}
+        <p>Please click the link below to activate this new account:</p>
+        <p><a href="{{ activation_link }}" class="button" style="color: #f4f4f4;">Activate Account</a></p>
+        
         <p class="footer">Best regards,<br>SVG 2 HOA Management Team</p>
     </div>
 </body>

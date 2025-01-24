@@ -1,4 +1,6 @@
 from django.conf import settings
+from weasyprint import HTML
+from io import BytesIO
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,13 +20,13 @@ from collections import Counter
 from datetime import date, timedelta, datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from .forms import UserSignUpForm, ReservationForm, CustomLoginForm, HouseholdForm, ResidentForm, RememberMeAuthenticationForm, ReservationStatusForm, ServiceRequestForm, ServiceRequestStatusForm, BillingStatusForm, NewsfeedForm, NewsletterForm, OfficerChangeForm, MemberChangeForm, ContactForm, AnnouncementForm, GrievanceForm, GrievanceStatusForm, NoteForm, FinancialFileForm
+from .forms import UserSignUpForm, ReservationForm, CustomLoginForm, HouseholdForm, ResidentForm, RememberMeAuthenticationForm, ReservationStatusForm, ServiceRequestForm, ServiceRequestStatusForm, BillingStatusForm, NewsfeedForm, NewsletterForm, OfficerChangeForm, MemberChangeForm, ContactForm, AnnouncementForm, GrievanceForm, GrievanceStatusForm, NoteForm, FinancialFileForm, TermForm, EmergencyHotlineForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Household, Resident, Reservation, Billing, ServiceRequest, Newsfeed, Officer, User, Announcement, GrievanceAppointment, Note, Notification, Member, Officer, FinancialFile
+from .models import Household, Resident, Reservation, Billing, ServiceRequest, Newsfeed, Officer, User, Announcement, GrievanceAppointment, Note, Notification, Member, Officer, FinancialFile, Term, EmergencyHotline
 from django.contrib import messages
 from django.http import Http404
 from django.views.generic.list import ListView
@@ -38,6 +40,11 @@ from django.core.paginator import Paginator
 from decimal import Decimal
 import logging
 from cloudinary.api import resource
+import os
+from pathlib import Path
+import cloudinary.uploader
+
+
 
 
 
@@ -145,17 +152,20 @@ def calendar(request, year=None, month=None):
 
 def news(request):
     latest_news = Newsfeed.objects.filter(created_at__lte=now()).order_by('-created_at').first()
-    
-    # Fetch all newsfeeds excluding the latest news
-    if latest_news:
-        newsfeeds = Newsfeed.objects.exclude(pk=latest_news.pk).order_by('-created_at')
-    else:
-        newsfeeds = Newsfeed.objects.all().order_by('-created_at')
-    
-    # Fetch the latest announcement with a future or current date
+    newsfeeds = Newsfeed.objects.exclude(pk=latest_news.pk).order_by('-created_at') if latest_news else Newsfeed.objects.all().order_by('-created_at')
     latest_announcement = Announcement.objects.filter(date__gte=now()).order_by('-date').first()
-    
-    return render(request, 'initial/news.html', {'newsfeeds': newsfeeds, 'latest_announcement': latest_announcement, 'latest_news': latest_news})
+
+    # Pagination
+    paginator_newsfeeds = Paginator(newsfeeds, 3)  # Adjust the number per page as needed
+    page_number_newsfeeds = request.GET.get('page_newsfeeds')
+    page_obj_newsfeeds = paginator_newsfeeds.get_page(page_number_newsfeeds)
+
+    return render(request, 'initial/news.html', {
+        'latest_news': latest_news,
+        'latest_announcement': latest_announcement,
+        'newsfeeds': page_obj_newsfeeds,
+        'page_obj_newsfeeds': page_obj_newsfeeds,  # Ensure the correct object is passed
+    })
     
 def news_article(request, pk):
     newsfeeds = Newsfeed.objects.exclude(id=pk).order_by('-created_at')
@@ -179,6 +189,8 @@ def about(request):
     }
     officers = list(Officer.objects.all())
     officers.sort(key=lambda x: officer_hierarchy.get(x.officer_position, 999))
+    terms = Term.objects.all().order_by('title')
+    hotlines = EmergencyHotline.objects.all().order_by('name')
 
     if request.method == "POST":
         form = ContactForm(request.POST)
@@ -191,7 +203,9 @@ def about(request):
 
     return render(request, 'initial/about.html', {
         'form': form,
-        'officers': officers
+        'officers': officers,
+        'terms': terms,
+        'hotlines': hotlines
     })
 
 def subscribe_newsletter(request):
@@ -211,12 +225,15 @@ class LoginSignupView(View):
     def get(self, request, *args, **kwargs):
         login_form = CustomLoginForm()
         signup_form = UserSignUpForm()
+        terms = Term.objects.all().order_by('title')
         return render(request, 'initial/login_signup.html', {
             'login_form': login_form,
-            'signup_form': signup_form
+            'signup_form': signup_form,
+            'terms': terms
         })
 
     def post(self, request, *args, **kwargs):
+        terms = Term.objects.all().order_by('title')
         if 'login' in request.POST:  # Handle login form submission
             login_form = CustomLoginForm(data=request.POST)
             signup_form = UserSignUpForm()
@@ -234,7 +251,7 @@ class LoginSignupView(View):
                 return self.redirect_user(user)
 
         elif 'signup' in request.POST:  # Handle signup form submission
-            signup_form = UserSignUpForm(request.POST)
+            signup_form = UserSignUpForm(request.POST, request.FILES)
             login_form = CustomLoginForm()
 
             if signup_form.is_valid():
@@ -243,7 +260,7 @@ class LoginSignupView(View):
                 user.save()  # Save user to the database
                             # Send the email verification link
                 send_activation_email(request, user)
-                messages.success(request, "Please check your email to verify your account.", extra_tags="sign_up")
+                messages.success(request, "Please wait for the HOA to verify and activate your account.", extra_tags="sign_up")
                 # Create notifications for all officers
                 
                 self.notify_officers(user)
@@ -253,7 +270,8 @@ class LoginSignupView(View):
         # Render the template with errors
         return render(request, 'initial/login_signup.html', {
             'login_form': login_form,
-            'signup_form': signup_form
+            'signup_form': signup_form,
+            'terms': terms
         })
 
     def redirect_user(self, user):
@@ -283,24 +301,27 @@ def send_activation_email(request, user):
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         activation_link = request.build_absolute_uri(reverse('activate', kwargs={'uidb64': uid, 'token': token}))
-        
-        subject = "Activate Your HOA Account"
+
+        proof_of_membership_url = user.proof_of_membership.url if user.proof_of_membership else None
+        subject = "Activate HOA Account"
         message = render_to_string('initial/activation_email.html', {
             'user': user,
             'activation_link': activation_link,
+            'proof_of_membership_url': proof_of_membership_url, 
         })
         
+        # Send the email to the HOA's main email address
         email = EmailMessage(
             subject=subject,
             body=message,
             from_email='springvillegardens2hoa@gmail.com',
-            to=[user.email],
+            to=['springvillegardens2hoa@gmail.com'],  # Sending to HOA's main email address
         )
         email.content_subtype = 'html'
         email.send()
-        logger.info(f"Activation email sent to {user.email}")
+        logger.info(f"Activation email sent to HOA main email (springvillegardens2hoa@gmail.com) for user {user.email}")
     except Exception as e:
-        logger.error(f"Failed to send activation email to {user.email}: {e}")
+        logger.error(f"Failed to send activation email to HOA main email (springvillegardens2hoa@gmail.com) for user {user.email}: {e}")
 
 def activate_account(request, uidb64, token):
     try:
@@ -425,17 +446,21 @@ def newsfeed(request, username):
         messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
         return redirect('login')
 
+
     latest_news = Newsfeed.objects.filter(created_at__lte=now()).order_by('-created_at').first()
-    # Fetch all newsfeeds excluding the latest news
-    if latest_news:
-        newsfeeds = Newsfeed.objects.exclude(pk=latest_news.pk).order_by('-created_at')
-    else:
-        newsfeeds = Newsfeed.objects.all().order_by('-created_at')
-    
-    # Fetch the latest announcement with a future or current date
+    newsfeeds = Newsfeed.objects.exclude(pk=latest_news.pk).order_by('-created_at') if latest_news else Newsfeed.objects.all().order_by('-created_at')
     latest_announcement = Announcement.objects.filter(date__gte=now()).order_by('-date').first()
-    
-    return render(request, 'member/newsfeed/newsfeed.html', {'newsfeeds': newsfeeds, 'latest_announcement': latest_announcement, 'latest_news': latest_news})
+
+    # Pagination
+    paginator_newsfeeds = Paginator(newsfeeds, 3)  # Adjust the number per page as needed
+    page_number_newsfeeds = request.GET.get('page_newsfeeds')
+    page_obj_newsfeeds = paginator_newsfeeds.get_page(page_number_newsfeeds)
+    return render(request, 'member/newsfeed/newsfeed.html', {
+        'latest_news': latest_news,
+        'latest_announcement': latest_announcement,
+        'newsfeeds': page_obj_newsfeeds,
+        'page_obj_newsfeeds': page_obj_newsfeeds,  # Ensure the correct object is passed
+    })
 
 @login_required
 @user_passes_test(is_member, login_url='/login')
@@ -568,18 +593,28 @@ class edit_household(RoleRequiredMixin, View):
     def post(self, request, username):
         household = get_object_or_404(Household, owner_name=request.user)
         form = HouseholdForm(request.POST, instance=household)
-        
+
         if form.is_valid():
-            form.save()
+            household = form.save(commit=False)
+
+            # Initialize an empty dictionary for vehicles data
+            vehicles_data = {}
+
+            # Iterate through all the vehicle types and get their quantities from the form
+            for vehicle, _ in form.VEHICLE_CHOICES:
+                vehicle_quantity = request.POST.get(f"vehicle_{vehicle}")
+                vehicles_data[vehicle] = int(vehicle_quantity) if vehicle_quantity else 0
+
+            # Update the vehicles_owned field with the new data
+            household.vehicles_owned = vehicles_data
+            household.save()
 
             messages.success(request, "Household updated successfully!", extra_tags="household_update")
+
             # Create a notification for all officers after successfully editing the household
             officers = User.objects.filter(is_officer=True)
             for officer in officers:
-                # Create the notification content (you can customize this message)
                 content = f"The household of {household.owner_name} has been updated."
-
-                # Create and save the notification
                 Notification.objects.create(
                     recipient=officer,
                     content=content,
@@ -587,7 +622,7 @@ class edit_household(RoleRequiredMixin, View):
                 )
 
             return redirect('household_detail', username=username)
-        
+
         return render(request, 'member/household/edit_household.html', {'form': form, 'household': household})
 
 #member_views_resident
@@ -1054,6 +1089,7 @@ class MyRequest(RoleRequiredMixin, ListView):
             queryset = queryset.filter(
                 Q(title__icontains=search_query) |
                 Q(service_type__icontains=search_query) |
+                Q(street__icontains=search_query) |
                 Q(status__icontains=search_query)
             )
 
@@ -1144,10 +1180,13 @@ def submit_request(request, username):
     else:
         form = ServiceRequestForm()
 
+    
+    street_choices = Household.STREET_CHOICES
     return render(request, 'member/services/submit_request.html', {
         'form': form,
         'user': user,
         'household': household,
+        'street_choices': street_choices,
         'servicerequests': servicerequests,
         'is_owner': is_owner,
     })
@@ -1196,8 +1235,9 @@ def update_request(request, username, request_id):
             return redirect('update_request', username=username, request_id=request_id)
     else:
         form = ServiceRequestForm(instance=service_request)
-
-    return render(request, 'member/services/update_request.html', {'form': form, 'service_request': service_request})
+    
+    street_choices = Household.STREET_CHOICES
+    return render(request, 'member/services/update_request.html', {'form': form, 'service_request': service_request, 'street_choices': street_choices})
 
 @login_required
 @user_passes_test(is_member, login_url='/login')
@@ -1294,9 +1334,8 @@ def make_appointment(request, username):
     try:
         household = Household.objects.get(owner_name=user)
     except Household.DoesNotExist:
-        # Handle the case where the user has no associated household
         messages.error(request, "You do not have an associated household.")
-        return redirect('add_household', username=username)  # Redirect to a page to create a household
+        return redirect('add_household', username=username)
 
     is_owner = household.owner_name == user if household else False
     grievanceappointments = household.grievance_appointments.all() if household else []
@@ -1317,21 +1356,37 @@ def make_appointment(request, username):
                 return redirect('make_appointment', username=username)
 
             grievance_appointment = form.save(commit=False)
+
+            if grievance_appointment.appointment_type == 'Certification':
+                grievance_appointment.certification_details = {
+                    'certification_for': form.cleaned_data['certification_for'],
+                    'postal_address': form.cleaned_data['postal_address'],
+                    'requested_by': form.cleaned_data['requested_by'],
+                    'purpose': form.cleaned_data['purpose'],
+                    'other_purpose': form.cleaned_data.get('other_purpose', ''),
+                }
+
             grievance_appointment.household = household
             grievance_appointment.save()
 
-            messages.success(request, "Appointment created successfully!", extra_tags="appointment_created")
+            # Generate PDF if it's a certification
+            if grievance_appointment.appointment_type == 'Certification':
+                pdf_url = generate_certification_pdf(grievance_appointment)
+                grievance_appointment.certification_pdf_url = pdf_url
+                grievance_appointment.save()
+                messages.success(request, f"Certification appointment created! PDF URL: {pdf_url}", extra_tags="appointment_created")
+            else:
+                messages.success(request, "Appointment created successfully!", extra_tags="appointment_created")
+                
             # Create a notification for all officers
             officers = User.objects.filter(is_officer=True)
             for officer in officers:
-                notification = Notification.objects.create(
-                    recipient=officer,  # Send notification to officer
+                Notification.objects.create(
+                    recipient=officer,
                     content=f"A new appointment has been created by {request.user.fname} {request.user.lname}.",
                     created_at=timezone.now()
                 )
-                notification.save()
 
-            messages.success(request, 'Appointment created successfully!')
             return redirect('make_appointment', username=username)
     else:
         form = GrievanceForm()
@@ -1653,16 +1708,18 @@ def officer_landing_page(request, username):
     # Initialize a counter for vehicle types
     vehicle_count = Counter()
 
-    # Iterate over all households and count each vehicle type
     households = Household.objects.all()
     for household in households:
         if household.vehicles_owned:
-            # Split the vehicles owned and count them
-            vehicles = household.vehicles_owned.split(', ')
-            vehicle_count.update(vehicles)
+            # Iterate through the dictionary items to count the vehicle types and sum the quantities
+            for vehicle, quantity in household.vehicles_owned.items():
+                # Only count vehicles with quantity > 0
+                if quantity > 0:
+                    vehicle_count[vehicle] += quantity  # Sum the quantities
 
     # Prepare the vehicle demographics as a list of dictionaries
     vehicle_demographics = [{'vehicles_owned': vehicle, 'total': count} for vehicle, count in vehicle_count.items()]
+    
     # Count entries for the chart
     reservation_count = Reservation.objects.count()
     appointment_count = GrievanceAppointment.objects.count()
@@ -2539,6 +2596,7 @@ class RequestListView(RoleRequiredMixin, ListView):
                 Q(household__owner_name__fname__icontains=search_query) |
                 Q(household__owner_name__lname__icontains=search_query) |
                 Q(service_type__icontains=search_query) |
+                Q(street__icontains=search_query) |
                 Q(title__icontains=search_query) |
                 Q(updated_at__icontains=search_query) |
                 Q(status__icontains=search_query)
@@ -3191,3 +3249,203 @@ class EditUserInfo(RoleRequiredMixin, View):
             'form': form,
             'roles_choices': available_roles_choices
         })
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def terms_and_hotline(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+    
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)  # Redirect to profile update page
+     
+    terms = Term.objects.all().order_by('-id')
+    hotlines = EmergencyHotline.objects.all().order_by('-id')
+    paginator_terms = Paginator(terms, 5) 
+    page_number_terms = request.GET.get('page_terms')
+    page_obj_terms = paginator_terms.get_page(page_number_terms) 
+
+ 
+    paginator_hotlines = Paginator(hotlines, 5) 
+    page_number_hotlines = request.GET.get('page_hotlines')
+    page_obj_hotlines = paginator_hotlines.get_page(page_number_hotlines) 
+
+    # Context for the template
+    context = {
+        'terms': page_obj_terms,  # Use the paginated page object for newsfeeds
+        'hotlines': page_obj_hotlines,  # Use the paginated page object for announcements
+        'page_obj_terms': page_obj_terms,  # Optional: explicitly pass page_obj_newsfeeds for pagination controls
+        'page_obj_hotlines': page_obj_hotlines,  # Optional: explicitly pass page_obj_announcements for pagination controls
+    }
+
+    # Render the template with the context
+    return render(request, 'officer/about_section/terms_and_hotline.html', context)
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def add_edit_term(request, username, term_id=None):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+    
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)  # Redirect to profile update page
+
+    term = get_object_or_404(Term, id=term_id) if term_id else None
+    is_edit = bool(term) 
+
+    if request.method == 'POST':
+        form = TermForm(request.POST, instance=term)
+        if form.is_valid():
+            term  = form.save()
+            # Create a success message
+            if is_edit:
+                messages.success(request, f'Term "{term.title}" updated successfully!', extra_tags="update_about")
+            else:
+                messages.success(request, 'Term added successfully!', extra_tags="update_about")
+            
+            # Create notification for officers
+            officers = User.objects.filter(is_officer=True).exclude(id=user.id)
+            for officer in officers:
+                # Notification content depends on whether the term is new or updated
+                notification_content = f"Term '{term.title}' has been added." if not is_edit else f"Term '{term.title}' has been updated by Officer {user.fname} {user.lname}."
+
+                Notification.objects.create(
+                    recipient=officer,
+                    content=notification_content,
+                    created_at=timezone.now()
+                )
+
+            members = User.objects.filter(is_member=True)
+            for member in members:
+                notification = Notification.objects.create(
+                    recipient=member,  # Send notification to member
+                    content=f"Term '{term.title}' has been added." if not is_edit else f"Term '{term.title}' has been updated by Officer {user.fname} {user.lname}.",
+                    created_at=timezone.now()
+                )
+                notification.save()
+
+            return redirect('terms_and_hotline', username=request.user.username)  # Replace with your redirect URL
+    else:
+        form = TermForm(instance=term)
+    return render(request, 'officer/about_section/terms_form.html', {'form': form, 'is_edit': is_edit, 'term': term })
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def add_edit_hotline(request, username, hotline_id=None):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+    
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=request.user.username)  # Redirect to profile update page
+
+    hotline = get_object_or_404(EmergencyHotline, id=hotline_id) if hotline_id else None
+    is_edit = bool(hotline) 
+    if request.method == 'POST':
+        form = EmergencyHotlineForm(request.POST, instance=hotline)
+        if form.is_valid():
+            hotline = form.save()
+
+            if is_edit:
+                messages.success(request, f'Hotline for "{hotline.name}" updated successfully!', extra_tags="update_about")
+            else:
+                messages.success(request, 'Hotline added successfully!', extra_tags="update_about")
+            
+            # Create notification for officers
+            officers = User.objects.filter(is_officer=True).exclude(id=user.id)
+            for officer in officers:
+                # Notification content depends on whether the term is new or updated
+                notification_content = f"Hotline for '{hotline.name}' has been added." if not is_edit else f"Hotline '{hotline.name}' has been updated by Officer {user.fname} {user.lname}."
+
+                Notification.objects.create(
+                    recipient=officer,
+                    content=notification_content,
+                    created_at=timezone.now()
+                )
+            
+            members = User.objects.filter(is_member=True)
+            for member in members:
+                notification = Notification.objects.create(
+                    recipient=member,  # Send notification to member
+                    content=f"Hotline for '{hotline.name}' has been added." if not is_edit else f"Hotline '{hotline.name}' has been updated by Officer {user.fname} {user.lname}.",
+                    created_at=timezone.now()
+                )
+                notification.save()
+
+            return redirect('terms_and_hotline', username=request.user.username)  # Replace with your redirect URL
+    else:
+        form = EmergencyHotlineForm(instance=hotline)
+    return render(request, 'officer/about_section/hotline_form.html', {'form': form, 'is_edit': is_edit, 'hotline': hotline })
+
+@login_required
+def delete_term(request, username, term_id):
+    term = get_object_or_404(Term, id=term_id)
+    user = request.user
+    if request.method == 'POST':
+        term_title = term.title  # Store the title of the term for notification
+        term.delete()
+
+        # Create a notification for officers
+        officers = User.objects.filter(is_officer=True).exclude(id=user.id)
+        for officer in officers:
+            Notification.objects.create(
+                recipient=officer,
+                content=f"The term '{term_title}' has been deleted by Officer {request.user.fname} {request.user.lname}.",
+                created_at=timezone.now()
+            )
+        messages.success(request, 'Terms deleted successfully!', extra_tags="update_about")
+        return redirect('terms_and_hotline', username=request.user.username)  # Replace with the appropriate redirect URL
+    messages.error(request, "Invalid request.", extra_tags="update_about")
+    return redirect('terms_and_hotline', username=request.user.username)
+
+@login_required
+def delete_hotline(request, username, hotline_id):
+    hotline = get_object_or_404(EmergencyHotline, id=hotline_id)
+    user = request.user
+    if request.method == 'POST':
+        hotline_name = hotline.name
+        hotline.delete()
+        # Create a notification for officers
+        officers = User.objects.filter(is_officer=True).exclude(id=user.id)
+        for officer in officers:
+            Notification.objects.create(
+                recipient=officer,
+                content=f"The hotline '{hotline_name}' has been deleted by Officer {request.user.fname} {request.user.lname}.",
+                created_at=timezone.now()
+            )
+        messages.success(request, 'Hotline deleted successfully!', extra_tags="update_about")
+        return redirect('terms_and_hotline', username=request.user.username)  # Replace with the appropriate redirect URL
+    messages.error(request, "Invalid request.", extra_tags="update_about")
+    return redirect('terms_and_hotline', username=request.user.username)
+
+def generate_certification_pdf(grievance_appointment):
+    # Render the HTML template with the certification details
+    html_content = render_to_string('pdf_templates/certification_template.html', {'grievance_appointment': grievance_appointment})
+    
+    # Generate the PDF in memory
+    pdf_stream = BytesIO()
+    HTML(string=html_content).write_pdf(pdf_stream)
+    pdf_stream.seek(0)  # Reset the stream pointer to the beginning
+    
+    # Upload the PDF to Cloudinary
+    response = cloudinary.uploader.upload(
+        pdf_stream,
+        resource_type="raw",  # Cloudinary treats non-image files as 'raw'
+        folder="certifications",  # Optional: Save in a specific folder
+        public_id=f"certification_{grievance_appointment.id}",  # Optional: Define a public ID
+        overwrite=True  # Overwrite if the file already exists
+    )
+
+    # Return the URL of the uploaded PDF
+    return response.get('secure_url')

@@ -83,6 +83,15 @@ User Profile
                             You have not updated your birth date yet.
                         {% endif %}</dd>
                     </div>
+                    <div class="py-2 grid grid-cols-3 gap-4 px-0 items-start">
+                        <dt class="ml-4 mr-8 text-sm font-medium leading-6 text-gray-900 col-span-1 ">Proof of Membership</dt>
+                          <dd class="text-sm leading-6 text-gray-700 xs:col-span-2 mt-0">
+                            {% if user.proof_of_membership %}
+                            <img class="w-40 w-40" src="{{ user.proof_of_membership.url }}" alt="{{ user.username }}"></dd>
+                            {% else %}
+                            No proof of membership uploaded.
+                            {% endif %}
+                      </div>
               
             </dl>
         </div>

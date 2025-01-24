@@ -58,6 +58,7 @@ Service Request List
                             onchange="this.form.submit()">
                             <option value="household" {% if sort_by == 'household' %}selected{% endif %}>Name</option>
                         <option value="service_type" {% if sort_by == 'service_type' %}selected{% endif %}>Service Type</option>
+                        <option value="street" {% if sort_by == 'street' %}selected{% endif %}>Street</option>
                         <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Subject</option>
                         <option value="updated_at" {% if sort_by == 'updated_at' %}selected{% endif %}>Submitted</option>
                         <option value="status" {% if sort_by == 'status' %}selected{% endif %}>Status</option>
@@ -91,6 +92,9 @@ Service Request List
                             Subject
                         </th>
                         <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
+                            Street
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
                             Submitted
                         </th>
                         <th scope="col" class="px-6 py-3 bg-green-700 dark:bg-gray-700 w-1/8">
@@ -116,6 +120,9 @@ Service Request List
                                 {{ servicerequest.title }}
                             </td>
                             <td class="px-6 py-4">
+                                {{ servicerequest.street }}
+                            </td>
+                            <td class="px-6 py-4">
                                 {{ servicerequest.updated_at }}
                             </td>
                             <td class="px-6 py-4">
@@ -127,7 +134,7 @@ Service Request List
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-4 text-gray-500 dark:text-gray-400">
                                 No requests found.
                             </td>
                         </tr>
