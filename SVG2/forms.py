@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Note, Notification, FinancialFile, Term, EmergencyHotline
+from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Note, Notification, FinancialFile, Term, EmergencyHotline, ElectionSession, Candidate, Vote
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from datetime import datetime, date, time
@@ -398,4 +398,38 @@ class EmergencyHotlineForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-input w-full'}),
             'number': forms.TextInput(attrs={'class': 'form-input w-full'}),
+        }
+
+class CandidateApplicationForm(forms.ModelForm):
+    class Meta:
+        model = Candidate
+        fields = []
+
+class VoteForm(forms.Form):
+    def __init__(self, *args, candidates=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['selected_candidates'] = forms.ModelMultipleChoiceField(
+            queryset=candidates,
+            widget=forms.CheckboxSelectMultiple,
+            required=True
+        )
+
+    def clean_selected_candidates(self):
+        selected_candidates = self.cleaned_data.get('selected_candidates')
+        if not selected_candidates:
+            raise forms.ValidationError("You must select candidates.")
+        if len(selected_candidates) > 15:
+            raise forms.ValidationError("You can vote for a maximum of 15 candidates.")
+        return selected_candidates
+
+class CreateElectionForm(forms.ModelForm):
+    class Meta:
+        model = ElectionSession
+        fields = ['name', 'start_date', 'end_date']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Enter election name',
+                'required': True,
+            }),
         }

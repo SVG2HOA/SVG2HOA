@@ -147,6 +147,13 @@
                 </p>
             </div>
             <ul class="py-1" role="none">
+              <li>
+                <a href="{% url 'about_section' user.username %}" class="flex items-center gap-x-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                </svg>
+                 About</a>
+              </li>
                 <li>
                   <a href="{% url 'member_profile_info' user.username %}" class="flex items-center gap-x-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
@@ -281,7 +288,7 @@ display: none !important;
 
 <aside id="logo-sidebar" class="fixed font-['Arial_Thin'] top-0 left-0 z-40 w-64 h-screen pt-24 transition-transform -translate-x-full bg-white border-r border-gray-200 lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
   <div class="h-full px-3 pb-4 overflow-y-auto dark:bg-gray-800">
-    <ul class="space-y-5 font-medium">
+    <ul class="space-y-3 font-medium">
       <li>
         <a href="{% url 'member_landing_page' username=user.username %}"
           class="flex items-center p-2 text-gray-900 rounded-md dark:text-white {% if request.resolver_match.url_name == 'member_landing_page' %} bg-green-700 text-white {% endif %} hover:text-white hover:bg-green-600 group">
@@ -362,6 +369,16 @@ display: none !important;
           <path d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
         </svg>
           <span class="ms-3 text-xl font-semibold tracking-wide">Financial Reports</span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'election_list' username=user.username %}"
+        class="flex items-center p-2 text-gray-900 rounded-md dark:text-white {% if request.resolver_match.url_name == 'election_list' %} bg-green-700 text-white {% endif %} hover:text-white hover:bg-green-600 group">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+          <path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375Z" />
+          <path fill-rule="evenodd" d="m3.087 9 .54 9.176A3 3 0 0 0 6.62 21h10.757a3 3 0 0 0 2.995-2.824L20.913 9H3.087Zm6.163 3.75A.75.75 0 0 1 10 12h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+        </svg>        
+          <span class="ms-3 text-xl font-semibold tracking-wide">Election</span>
         </a>
       </li>
     </ul>

@@ -20,13 +20,13 @@ from collections import Counter
 from datetime import date, timedelta, datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from .forms import UserSignUpForm, ReservationForm, CustomLoginForm, HouseholdForm, ResidentForm, RememberMeAuthenticationForm, ReservationStatusForm, ServiceRequestForm, ServiceRequestStatusForm, BillingStatusForm, NewsfeedForm, NewsletterForm, OfficerChangeForm, MemberChangeForm, ContactForm, AnnouncementForm, GrievanceForm, GrievanceStatusForm, NoteForm, FinancialFileForm, TermForm, EmergencyHotlineForm
+from .forms import UserSignUpForm, ReservationForm, CustomLoginForm, HouseholdForm, ResidentForm, RememberMeAuthenticationForm, ReservationStatusForm, ServiceRequestForm, ServiceRequestStatusForm, BillingStatusForm, NewsfeedForm, NewsletterForm, OfficerChangeForm, MemberChangeForm, ContactForm, AnnouncementForm, GrievanceForm, GrievanceStatusForm, NoteForm, FinancialFileForm, TermForm, EmergencyHotlineForm, CreateElectionForm, CandidateApplicationForm, VoteForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Household, Resident, Reservation, Billing, ServiceRequest, Newsfeed, Officer, User, Announcement, GrievanceAppointment, Note, Notification, Member, Officer, FinancialFile, Term, EmergencyHotline
+from .models import Household, Resident, Reservation, Billing, ServiceRequest, Newsfeed, Officer, User, Announcement, GrievanceAppointment, Note, Notification, Member, Officer, FinancialFile, Term, EmergencyHotline, ElectionSession, Candidate, Vote
 from django.contrib import messages
 from django.http import Http404
 from django.views.generic.list import ListView
@@ -1398,6 +1398,27 @@ def make_appointment(request, username):
         'grievanceappointments': grievanceappointments,
         'is_owner': is_owner,
     })
+
+def generate_certification_pdf(grievance_appointment):
+    # Render the HTML template with the certification details
+    html_content = render_to_string('pdf_templates/certification_template.html', {'grievance_appointment': grievance_appointment})
+    
+    # Generate the PDF in memory
+    pdf_stream = BytesIO()
+    HTML(string=html_content).write_pdf(pdf_stream)
+    pdf_stream.seek(0)  # Reset the stream pointer to the beginning
+    
+    # Upload the PDF to Cloudinary
+    response = cloudinary.uploader.upload(
+        pdf_stream,
+        resource_type="raw",  # Cloudinary treats non-image files as 'raw'
+        folder="certifications",  # Optional: Save in a specific folder
+        public_id=f"certification_{grievance_appointment.id}",  # Optional: Define a public ID
+        overwrite=True  # Overwrite if the file already exists
+    )
+
+    # Return the URL of the uploaded PDF
+    return response.get('secure_url')
 
 @login_required
 @user_passes_test(is_member, login_url='/login')
@@ -2864,6 +2885,76 @@ def manage_users(request, username):
 
     return render(request, 'officer/usermgt/manage_users.html', context)
 
+class ViewUserInfo(RoleRequiredMixin, View):
+    allowed_roles = ['is_officer']
+    def get(self, request, username, user_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+        user_prof = get_object_or_404(User, id=user_id)
+        return render(request, 'officer/usermgt/user_profile.html', {'user_prof': user_prof})
+
+class EditUserInfo(RoleRequiredMixin, View):
+    allowed_roles = ['is_officer']
+    def get(self, request, username, user_id):
+        if username != request.user.username:
+            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+            return redirect('login')
+        user_prof = get_object_or_404(User, id=user_id)
+        form = OfficerChangeForm(instance=user_prof)
+        assigned_roles = Officer.objects.exclude(user=user_prof).values_list('officer_position', flat=True)
+        available_roles_choices = [choice for choice in Officer.ROLES_CHOICES if choice[0] not in assigned_roles]
+        context = {
+        'user_prof': user_prof,
+        'form': form,
+        'roles_choices': available_roles_choices
+        }
+
+        return render(request, 'officer/usermgt/update_user_prof.html', context)
+
+    def post(self, request, username, user_id):
+        user_prof = get_object_or_404(User, id=user_id)
+        form = OfficerChangeForm(request.POST, request.FILES, instance=user_prof)
+        
+        if form.is_valid():
+            # Save the form
+            user_prof = form.save()
+
+            messages.success(request, "User updated successfully!", extra_tags="user_officer_update")
+            # Get the officer who made the edit
+            editing_officer = request.user
+
+            # Send a notification to the household (connected resident)
+            notification = Notification.objects.create(
+                recipient=user_prof,  # Assuming the notification relates to the household
+                content=f"Your profile has been updated by Officer {editing_officer.fname} {editing_officer.lname}.",
+                created_at=timezone.now()
+            )
+            notification.save()
+
+            # Send notifications to all other officers
+            officers = User.objects.filter(is_officer=True).exclude(id=editing_officer.id)
+            for officer in officers:
+                notification = Notification.objects.create(
+                    recipient=officer,
+                    content=f"User profile of {user_prof.fname} {user_prof.fname} have been updated by Officer {editing_officer.fname} {editing_officer.lname}.",
+                    created_at=timezone.now()
+                )
+                notification.save()
+
+            return redirect('user_profile', username=username, user_id=user_prof.id)
+        else:
+            form = OfficerChangeForm(instance=user_prof)
+        
+        assigned_roles = Officer.objects.exclude(user=user_prof).values_list('officer_position', flat=True)
+        available_roles_choices = [choice for choice in Officer.ROLES_CHOICES if choice[0] not in assigned_roles]
+
+        return render(request, 'officer/usermgt/update_user_prof.html', {
+            'user_prof': user_prof,
+            'form': form,
+            'roles_choices': available_roles_choices
+        })
+
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def toggle_user_activation(request, username, user_id):
@@ -3180,76 +3271,7 @@ def mark_all_as_read(request):
     Notification.objects.filter(recipient=request.user, read=False).update(read=True)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-class ViewUserInfo(RoleRequiredMixin, View):
-    allowed_roles = ['is_officer']
-    def get(self, request, username, user_id):
-        if username != request.user.username:
-            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
-            return redirect('login')
-        user_prof = get_object_or_404(User, id=user_id)
-        return render(request, 'officer/usermgt/user_profile.html', {'user_prof': user_prof})
-
-class EditUserInfo(RoleRequiredMixin, View):
-    allowed_roles = ['is_officer']
-    def get(self, request, username, user_id):
-        if username != request.user.username:
-            messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
-            return redirect('login')
-        user_prof = get_object_or_404(User, id=user_id)
-        form = OfficerChangeForm(instance=user_prof)
-        assigned_roles = Officer.objects.exclude(user=user_prof).values_list('officer_position', flat=True)
-        available_roles_choices = [choice for choice in Officer.ROLES_CHOICES if choice[0] not in assigned_roles]
-        context = {
-        'user_prof': user_prof,
-        'form': form,
-        'roles_choices': available_roles_choices
-        }
-
-        return render(request, 'officer/usermgt/update_user_prof.html', context)
-
-    def post(self, request, username, user_id):
-        user_prof = get_object_or_404(User, id=user_id)
-        form = OfficerChangeForm(request.POST, request.FILES, instance=user_prof)
-        
-        if form.is_valid():
-            # Save the form
-            user_prof = form.save()
-
-            messages.success(request, "User updated successfully!", extra_tags="user_officer_update")
-            # Get the officer who made the edit
-            editing_officer = request.user
-
-            # Send a notification to the household (connected resident)
-            notification = Notification.objects.create(
-                recipient=user_prof,  # Assuming the notification relates to the household
-                content=f"Your profile has been updated by Officer {editing_officer.fname} {editing_officer.lname}.",
-                created_at=timezone.now()
-            )
-            notification.save()
-
-            # Send notifications to all other officers
-            officers = User.objects.filter(is_officer=True).exclude(id=editing_officer.id)
-            for officer in officers:
-                notification = Notification.objects.create(
-                    recipient=officer,
-                    content=f"User profile of {user_prof.fname} {user_prof.fname} have been updated by Officer {editing_officer.fname} {editing_officer.lname}.",
-                    created_at=timezone.now()
-                )
-                notification.save()
-
-            return redirect('user_profile', username=username, user_id=user_prof.id)
-        else:
-            form = OfficerChangeForm(instance=user_prof)
-        
-        assigned_roles = Officer.objects.exclude(user=user_prof).values_list('officer_position', flat=True)
-        available_roles_choices = [choice for choice in Officer.ROLES_CHOICES if choice[0] not in assigned_roles]
-
-        return render(request, 'officer/usermgt/update_user_prof.html', {
-            'user_prof': user_prof,
-            'form': form,
-            'roles_choices': available_roles_choices
-        })
-
+#officer_views_terms_and_hotline
 @login_required
 @user_passes_test(is_officer, login_url='/login')
 def terms_and_hotline(request, username):
@@ -3429,23 +3451,360 @@ def delete_hotline(request, username, hotline_id):
     messages.error(request, "Invalid request.", extra_tags="update_about")
     return redirect('terms_and_hotline', username=request.user.username)
 
-def generate_certification_pdf(grievance_appointment):
-    # Render the HTML template with the certification details
-    html_content = render_to_string('pdf_templates/certification_template.html', {'grievance_appointment': grievance_appointment})
-    
-    # Generate the PDF in memory
-    pdf_stream = BytesIO()
-    HTML(string=html_content).write_pdf(pdf_stream)
-    pdf_stream.seek(0)  # Reset the stream pointer to the beginning
-    
-    # Upload the PDF to Cloudinary
-    response = cloudinary.uploader.upload(
-        pdf_stream,
-        resource_type="raw",  # Cloudinary treats non-image files as 'raw'
-        folder="certifications",  # Optional: Save in a specific folder
-        public_id=f"certification_{grievance_appointment.id}",  # Optional: Define a public ID
-        overwrite=True  # Overwrite if the file already exists
+#member_views_election
+@login_required
+@user_passes_test(is_member, login_url='/login')
+def election_list(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="member_update_prof")
+        return redirect('member_update_profile', username=user.username)
+
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', 'start_date')
+    direction = request.GET.get('direction', 'desc')
+
+    # Apply filters
+    elections = ElectionSession.objects.all()
+    if search_query:
+        elections = elections.filter(
+            Q(name__icontains=search_query) |
+            Q(start_date__icontains=search_query) |
+            Q(end_date__icontains=search_query)
+        )
+
+    # Apply sorting
+    order_prefix = '' if direction == 'asc' else '-'
+    if sort_by in ['start_date', 'end_date', 'name', 'is_active']:
+        elections = elections.order_by(f'{order_prefix}{sort_by}')
+
+    # Paginate results
+    paginator = Paginator(elections, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Context
+    context = {
+        'elections': page_obj,
+        'sort_by': sort_by,
+        'direction': direction,
+        'search_query': search_query,
+    }
+
+    return render(request, 'member/election/elections.html', context)
+
+@login_required
+@user_passes_test(is_member, login_url='/login')
+def view_election(request, username, election_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="member_update_prof")
+        return redirect('member_update_profile', username=user.username)
+
+    election = get_object_or_404(ElectionSession, id=election_id)
+    candidates = Candidate.objects.filter(election=election)
+
+    # Handle candidate application
+    if request.method == "POST" and "CandidateApplicationForm" in request.POST:
+        if not Candidate.objects.filter(user=user, election=election).exists():
+            Candidate.objects.create(user=user, election=election)
+            messages.success(request, "You have successfully registered as a candidate.", extra_tags="election")
+        else:
+            messages.error(request, "You are already a candidate in this election.", extra_tags="election")
+        return redirect("view_election", username=username, election_id=election.id)
+    else:
+        candidate_form = CandidateApplicationForm()
+    # Handle vote submission
+    if request.method == "POST" and "VoteForm" in request.POST:
+        vote_form = VoteForm(request.POST, candidates=candidates)
+        if vote_form.is_valid():
+            selected_candidates = vote_form.cleaned_data['selected_candidates']
+            if not Vote.objects.filter(voter=user, election=election).exists():
+                vote = Vote.objects.create(voter=user, election=election)
+                vote.candidates.set(selected_candidates)
+                messages.success(request, "Your vote has been submitted successfully.", extra_tags="election")
+            else:
+                messages.error(request, "You have already voted in this election.", extra_tags="election")
+            return redirect("view_election", username=username, election_id=election.id)
+        else:
+            messages.error(request, "There was an error with your vote. Please try again.", extra_tags="election")
+    else:
+        vote_form = VoteForm(candidates=candidates)
+
+    # Fetch candidates and their vote counts
+    candidates = (
+        Candidate.objects.filter(election=election)
+        .annotate(vote_count=Count('votes'))
+        .order_by('-vote_count')
     )
 
-    # Return the URL of the uploaded PDF
-    return response.get('secure_url')
+    # Prepare data for the chart
+    voting_data = [
+    {
+        "candidate_name": f"{candidate.user.fname} {candidate.user.lname}",
+        "votes": candidate.vote_count
+    }
+    for candidate in candidates
+    ]
+
+    context = {
+        "election": election,
+        "candidates": candidates,
+        "candidate_form": candidate_form,
+        "vote_form": vote_form,
+        "election": election,
+        "voting_data": voting_data,
+    }
+
+    return render(request, 'member/election/election_details.html', context)
+
+@login_required
+@user_passes_test(is_member, login_url='/login')
+def about_section(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+
+    officer_hierarchy = {
+        'President': 1,
+        'Vice President': 2,
+        'Secretary': 3,
+        'Treasurer': 4,
+        'Auditor': 5,
+        'P.R.O': 6,
+    }
+    officers = list(Officer.objects.all())
+    officers.sort(key=lambda x: officer_hierarchy.get(x.officer_position, 999))
+    terms = Term.objects.all().order_by('title')
+    hotlines = EmergencyHotline.objects.all().order_by('name')
+
+    return render(request, 'member/about.html', {
+        'officers': officers,
+        'terms': terms,
+        'hotlines': hotlines
+    })
+
+#officer_views_election
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def manage_elections(request, username):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=user.username)
+
+    if request.method == 'POST':
+        form = CreateElectionForm(request.POST)
+        if form.is_valid():
+
+            election = form.save(commit=False)
+            # Store the officer who is creating the announcement
+            creating_officer = request.user
+            
+            # Save the new announcement
+            election = form.save()
+            
+            messages.success(request, "New election created successfully!", extra_tags="election")
+
+            # Send notifications to all officers except the one who updated the announcement
+            officers = User.objects.filter(is_officer=True).exclude(id=creating_officer.id)
+            for officer in officers:
+                notification = Notification.objects.create(
+                    recipient=officer,  # Send notification to officer
+                    content=f"New Election: {election.name} has been started by {creating_officer.fname} {creating_officer.lname}.",
+                    created_at=timezone.now()
+                )
+                notification.save()
+
+            # Send notifications to all members
+            members = User.objects.filter(is_member=True)
+            for member in members:
+                notification = Notification.objects.create(
+                    recipient=member,  # Send notification to member
+                    content=f"New Election: {election.name}",
+                    created_at=timezone.now()
+                )
+                notification.save()
+
+            return redirect('manage_elections', username=username)
+    else:
+        form = CreateElectionForm()
+
+    # Apply filters
+    elections = ElectionSession.objects.all()
+
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', 'start_date')
+    direction = request.GET.get('direction', 'desc')
+    
+    if search_query:
+        elections = elections.filter(
+            Q(name__icontains=search_query) |
+            Q(start_date__icontains=search_query) |
+            Q(end_date__icontains=search_query)
+        )
+
+    # Apply sorting
+    order_prefix = '' if direction == 'asc' else '-'
+    if sort_by in ['start_date', 'end_date', 'name', 'is_active']:
+        elections = elections.order_by(f'{order_prefix}{sort_by}')
+
+    # Paginate results
+    paginator = Paginator(elections, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Context
+    context = {
+        'elections': page_obj,
+        'form': form,
+        'sort_by': sort_by,
+        'direction': direction,
+        'search_query': search_query,
+    }
+
+    return render(request, 'officer/election/manage_elections.html', context)
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def toggle_election(request, username, election_id):
+    election = get_object_or_404(ElectionSession, id=election_id)
+
+    # Check if the user making the request is an officer
+    if request.user.is_officer:
+        # Toggle the user's active status
+        previous_status = election.is_open
+        election.is_open = not election.is_open
+        election.save()
+
+        # Create a notification for the user whose account was toggled
+        action = "opened" if election.is_open else "closed"
+
+        users = User.objects.all().exclude(id=request.user.id)
+        for user in users:
+            notification = Notification.objects.create(
+                recipient=user,
+                content=f"Election for {election.name} has been {action} by Officer {request.user.fname} {request.user.lname}.",
+                created_at=timezone.now()
+            )
+            notification.save()
+
+        # Optionally, add a success message to the request
+        messages.success(request, f"Election for {election.name} has been {action}!", extra_tags="election")
+
+    # Redirect to the manage_users view using the officer's username
+    return redirect('manage_elections', username=request.user.username)
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def delete_election(request, username, election_id):
+    election = get_object_or_404(ElectionSession, id=election_id)
+
+    if request.method == 'POST':
+        # Save the deleted user's name for notification content
+        delete_session = f"{election.name} "
+        
+        # Delete the user
+        election.delete()
+
+        messages.success(request, f"Election for {delete_session} has been deleted successfully!", extra_tags="election")
+        # Notify all officers except the one performing the deletion
+        officers = User.objects.filter(is_officer=True).exclude(id=request.user.id)
+        for officer in officers:
+            Notification.objects.create(
+                recipient=officer,
+                content=f"Officer {request.user.fname} {request.user.lname} deleted the election session for {delete_session}.",
+                created_at=timezone.now()
+            )
+
+        # Redirect to manage users page
+        return redirect('manage_elections', username=username)
+
+    return redirect('manage_elections', username=username)
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def election_details(request, username, election_id):
+    if username != request.user.username:
+        messages.error(request, "You are not authorized to access this page.", extra_tags="unauthorized")
+        return redirect('login')
+    user = request.user
+
+    # Check if the user's profile is updated
+    if not user.fname or not user.lname:
+        messages.warning(request, "Update your profile first!", extra_tags="officer_update_prof")
+        return redirect('officer_update_profile', username=user.username)
+
+    election = get_object_or_404(ElectionSession, id=election_id)
+    candidates = Candidate.objects.filter(election=election)
+
+     # Fetch candidates and their vote counts
+    candidates = (
+        Candidate.objects.filter(election=election)
+        .annotate(vote_count=Count('votes'))
+        .order_by('-vote_count')
+    )
+
+    # Prepare data for the chart
+    voting_data = [
+    {
+        "candidate_name": f"{candidate.user.fname} {candidate.user.lname}",
+        "votes": candidate.vote_count
+    }
+    for candidate in candidates
+    ]
+    
+    context = {
+        "election": election,
+        "candidates": candidates,
+        "election": election,
+        "voting_data": voting_data,
+    }
+
+    return render(request, 'officer/election/election_details.html', context)
+
+@login_required
+@user_passes_test(is_officer, login_url='/login')
+def delete_candidate(request, username, election_id, candidate_id):
+    election = get_object_or_404(ElectionSession, id=election_id)
+    candidate = get_object_or_404(Candidate, id=candidate_id)
+
+    if request.method == 'POST':
+        # Save the deleted candidate's name for notification content
+        delete_candidate = f"{candidate.user.fname} {candidate.user.lname}"
+        
+        # Delete the candidate
+        candidate.delete()
+
+        # Send a success message to the user
+        messages.success(request, f"Candidate {delete_candidate} for Election {election.name} has been removed successfully!", extra_tags="election")
+        
+        # Notify all officers except the one performing the deletion
+        officers = User.objects.filter(is_officer=True).exclude(id=request.user.id)
+        for officer in officers:
+            Notification.objects.create(
+                recipient=officer,
+                content=f"Officer {request.user.fname} {request.user.lname} removed Candidate {delete_candidate} for Election {election.name}.",
+                created_at=timezone.now()
+            )
+
+        # Redirect to the election details page
+        return redirect('election_details', username=request.user.username, election_id=election.id)
+
+    # If not a POST request, just redirect back to the election details
+    return redirect('election_details', username=request.user.username, election_id=election.id)

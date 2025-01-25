@@ -6,6 +6,7 @@ from cloudinary_storage.storage import MediaCloudinaryStorage
 from cloudinary.models import CloudinaryField
 from ckeditor_uploader.fields import RichTextUploadingField
 from cloudinary.api import resource
+from django.utils.timezone import now 
 
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
@@ -423,3 +424,28 @@ class EmergencyHotline(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.number}"
+
+class ElectionSession(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_open = models.BooleanField(default=False)  # New field to toggle election status manually
+
+    def __str__(self):
+        return self.name
+
+class Candidate(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='candidacy')
+    election = models.ForeignKey(ElectionSession, on_delete=models.CASCADE, related_name='candidates')
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} ({self.user.username})"
+
+class Vote(models.Model):
+    voter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='votes')
+    election = models.ForeignKey(ElectionSession, on_delete=models.CASCADE, related_name='votes')
+    candidates = models.ManyToManyField(Candidate, related_name='votes')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Vote by {self.voter.username} in {self.election.name}"

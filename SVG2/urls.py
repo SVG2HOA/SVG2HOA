@@ -68,6 +68,10 @@ urlpatterns = [
     #member financial report
     path('<username>/financial-statements/', views.financial_status, name='financial_status'),
     path('<username>/financial-statements/download/<int:file_id>/', views.download_file, name='download_file'),
+    #member election
+    path('<username>/elections/', views.election_list, name='election_list'),
+    path('<username>/elections/<int:election_id>', views.view_election, name='view_election'),
+    path('<username>/about_section/', views.about_section, name='about_section'),
 
 #views for officers
     path('officer/<username>/dashboard/',  views.officer_landing_page, name='officer_landing_page'),
@@ -129,8 +133,15 @@ urlpatterns = [
     path('officer/<username>/terms-and-hotlines/add-hotline/', add_edit_hotline, name='add_hotline'),
     path('officer/<username>/terms-and-hotlines/edit-hotline/<int:hotline_id>/', add_edit_hotline, name='edit_hotline'),
     path('officer/<username>/terms-and-hotlines/delete-hotline/<int:hotline_id>/', delete_hotline, name='delete_hotline'),
+    #officer election
+    path('officer/<username>/elections/', views.manage_elections, name='manage_elections'),
+    path('officer/<username>/elections/<int:election_id>', views.election_details, name='election_details'),
+    path('officer/<username>/elections/<int:election_id>/<int:candidate_id>/delete/', views.delete_candidate, name='delete_candidate'),
+    path('officer/<username>/elections/<int:election_id>/delete/', views.delete_election, name='delete_election'),
+    path('officer/<username>/elections/<int:election_id>/toggle_status/', views.toggle_election, name='toggle_election'),
 
     path("<username>/household/billing/<int:billing_id>/", create_payment_link, name="create_payment_link"),
+
 ]
 
 if settings.DEBUG:

@@ -9,6 +9,24 @@ Household: {{ household.owner_name.fname }} {{ household.owner_name.lname }}
 {% block content %}
 <div class="pt-16 lg:ml-64">
   <div class="p-4 dark:border-gray-700">
+    
+  <nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center mt-4 space-x-1 md:space-x-2 rtl:space-x-reverse">
+      <li class="inline-flex items-center">
+        <a href="{% url 'household_list' user.username %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+          Households
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+          </svg>
+          <p class="ms-1 text-sm font-medium text-gray-700 md:ms-2 dark:text-gray-400 dark:hover:text-white">Household ({{ household.owner_name.fname }} {{ household.owner_name.lname }})</p>
+        </div>
+      </li>
+    </ol>
+  </nav>
 
     <div class="mt-4">
       <div class="sm:px-0">
@@ -26,7 +44,6 @@ Household: {{ household.owner_name.fname }} {{ household.owner_name.lname }}
     {% endif %}
     
         <h3 class="text-3xl font-semibold leading-7 text-gray-900 mr-5">Household Information</h3>
-        <p class="text-sm leading-6 text-gray-600 mt-2">View and manage household information of members, including resident details and billing status.</p>
         {% if user.is_officer %}
         <a href="{% url 'modify_household' user.username household.id %}"
         class="text-sm font-semibold leading-7 text-blue-700 flex items-center gap-1 mt-1 hover:text-blue-500">Edit<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-3">

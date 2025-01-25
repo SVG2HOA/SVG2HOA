@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Notification, FinancialFile, Term, EmergencyHotline
+from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Notification, FinancialFile, Term, EmergencyHotline, ElectionSession, Candidate, Vote
 
 class UserAdmin(UserAdmin):
     model = User
@@ -102,6 +102,19 @@ class TermAdmin(admin.ModelAdmin):
 @admin.register(EmergencyHotline)
 class EmergencyHotlineAdmin(admin.ModelAdmin):
     list_display = ('name', 'number')
+
+@admin.register(ElectionSession)
+class ElectionSessionAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name', 'start_date', 'end_date', 'is_open')
+
+@admin.register(Candidate)
+class CandidateAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'user', 'election')
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'voter', 'election', 'submitted_at')
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(NewsletterSubscriber)

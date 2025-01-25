@@ -301,7 +301,7 @@ display: none !important;
 
 <aside id="logo-sidebar" class="fixed font-['Arial_Thin'] top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-green-900 border-r border-gray-200 lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
   <div class="h-full px-3 pb-4 overflow-y-auto dark:bg-gray-800 pt-2">
-    <ul class="space-y-2 font-medium text-white">
+    <ul class="space-y-1 font-medium text-white">
       <li>
             <a href="{% url 'officer_landing_page' username=user.username %}" class="flex items-center p-2 rounded-md dark:text-white {% if request.resolver_match.url_name == 'officer_landing_page' %} text-green-800 bg-gray-200 {% endif %} hover:text-green-700 hover:bg-white group">
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
@@ -388,13 +388,22 @@ display: none !important;
       </a>
    </li>
          <li>              
-          <a href="{% url 'manage_users' username=user.username %}" class="flex items-center p-2 rounded dark:text-white {% if request.resolver_match.url_name == 'manage_users' %} text-green-800 bg-gray-200 {% endif %} hover:text-green-700 hover:bg-white group">
+          <a href="{% url 'manage_users' username=user.username %}" class="flex items-center p-2 rounded dark:text-white {% if request.resolver_match.url_name == 'manage_users' or request.resolver_match.url_name == 'user_profile' or request.resolver_match.url_name == 'edit_user' %} text-green-800 bg-gray-200 {% endif %} hover:text-green-700 hover:bg-white group">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
               <path d="M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-1.01.75.75 0 0 0 .42-.643 4.875 4.875 0 0 0-6.957-4.611 8.586 8.586 0 0 1 1.71 5.157v.003Z" />
             </svg>
             <span class="ms-3 text-xl font-semibold tracking-wide">Manage Users</span>
           </a>
        </li>
+       <li>              
+        <a href="{% url 'manage_elections' username=user.username %}" class="flex items-center p-2 rounded dark:text-white {% if request.resolver_match.url_name == 'manage_elections' or request.resolver_match.url_name == 'election_details' %} text-green-800 bg-gray-200 {% endif %} hover:text-green-700 hover:bg-white group">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+            <path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375Z" />
+            <path fill-rule="evenodd" d="m3.087 9 .54 9.176A3 3 0 0 0 6.62 21h10.757a3 3 0 0 0 2.995-2.824L20.913 9H3.087Zm6.163 3.75A.75.75 0 0 1 10 12h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+          </svg>
+          <span class="ms-3 text-xl font-semibold tracking-wide">Elections</span>
+        </a>
+     </li>
       </ul>
    </div>
 </aside>
