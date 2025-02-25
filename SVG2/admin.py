@@ -2,7 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User, Member, Officer, Household, Resident, Reservation, ServiceRequest, Billing, Newsfeed, NewsletterSubscriber, ContactSender, Announcement, GrievanceAppointment, Notification, FinancialFile, Term, EmergencyHotline, ElectionSession, Candidate, Vote
 
-class UserAdmin(UserAdmin):
+
+admin.site.register(User, UserAdmin)
+class UserAdmin(admin.ModelAdmin):
     model = User
     list_display = ['pk', 'username', 'fname', 'lname', 'email', 'is_staff', 'is_member', 'is_officer', 'phone_number', 'profile_picture', 'proof_of_membership']
     readonly_fields = ('proof_of_membership',)
@@ -116,7 +118,6 @@ class VoteAdmin(admin.ModelAdmin):
     list_display = ('pk', 'voter', 'election', 'submitted_at')
 
 
-admin.site.register(User, UserAdmin)
 admin.site.register(NewsletterSubscriber)
 admin.site.register(ContactSender)
 admin.site.register(Notification)
