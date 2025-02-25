@@ -21,7 +21,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-h)=0ikgj6s+vsrhpwrp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['svg2hoa.onrender.com', '127.0.0.1']
+ALLOWED_HOSTS = ['svg2hoa.onrender.com', '127.0.0.1', 'svg2hoa-mmhq.onrender.com']
 
 
 
