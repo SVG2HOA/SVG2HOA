@@ -132,7 +132,7 @@ WSGI_APPLICATION = 'HOA_MIS.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'postgresql://svg2hoadatabase_09ec_user:SnyeJDQBsGEjCZBYk31bki46k0TbLmqW@dpg-ctrccctds78s73dkgge0-a.singapore-postgres.render.com/svg2hoadatabase_09ec')
+        default=os.getenv('DATABASE_URL', 'postgresql://svg2db_user:u63YPqZGacbXtJLS6dEOI63FZWvZYFmZ@dpg-cuulbj23esus73a9s4pg-a.singapore-postgres.render.com/svg2db')
     )
 }
 
